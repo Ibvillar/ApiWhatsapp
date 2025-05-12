@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "EL8HAaMBg6rgVsS/KgvCSztaXIefCuTLwihTrb+/n4g=",
+  "Source": "ApiWhatsapp",
+  "BasePath": "_content/ApiWhatsapp",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

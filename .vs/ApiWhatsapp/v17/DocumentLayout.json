@@ -1,0 +1,156 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Proyectos\\ApiWhatsapp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\controller\\weebhookcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:controller\\weebhookcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\entities\\weebhook.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:entities\\weebhook.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\data\\dbwhatsapp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:data\\dbwhatsapp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\entitties\\fichero.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:entitties\\fichero.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\entitties\\mensaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:entitties\\mensaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\entitties\\telefono.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:entitties\\telefono.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\swagger\\authorithationfilter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:swagger\\authorithationfilter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WeebhookController.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Controller\\WeebhookController.cs",
+              "RelativeDocumentMoniker": "Controller\\WeebhookController.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Controller\\WeebhookController.cs",
+              "RelativeToolTip": "Controller\\WeebhookController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-12T08:15:50.255Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Telefono.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Entitties\\Telefono.cs",
+              "RelativeDocumentMoniker": "Entitties\\Telefono.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Entitties\\Telefono.cs",
+              "RelativeToolTip": "Entitties\\Telefono.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-12T07:58:50.621Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Mensaje.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Entitties\\Mensaje.cs",
+              "RelativeDocumentMoniker": "Entitties\\Mensaje.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Entitties\\Mensaje.cs",
+              "RelativeToolTip": "Entitties\\Mensaje.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-12T07:58:43.571Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Fichero.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Entitties\\Fichero.cs",
+              "RelativeDocumentMoniker": "Entitties\\Fichero.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Entitties\\Fichero.cs",
+              "RelativeToolTip": "Entitties\\Fichero.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-12T07:58:36.15Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DbWhatsapp.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Data\\DbWhatsapp.cs",
+              "RelativeDocumentMoniker": "Data\\DbWhatsapp.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Data\\DbWhatsapp.cs",
+              "RelativeToolTip": "Data\\DbWhatsapp.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA0AAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-12T07:54:46.748Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AuthorithationFilter.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Swagger\\AuthorithationFilter.cs",
+              "RelativeDocumentMoniker": "Swagger\\AuthorithationFilter.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Swagger\\AuthorithationFilter.cs",
+              "RelativeToolTip": "Swagger\\AuthorithationFilter.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-12T07:39:18.801Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-09T09:56:02.998Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Weebhook.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Entities\\Weebhook.cs",
+              "RelativeDocumentMoniker": "Entities\\Weebhook.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Entities\\Weebhook.cs",
+              "RelativeToolTip": "Entities\\Weebhook.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-09T09:54:23.021Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
