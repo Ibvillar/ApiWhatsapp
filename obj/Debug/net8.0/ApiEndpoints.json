@@ -1,5 +1,73 @@
 [
   {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "EnviarMensajeDocumento",
+    "RelativePath": "mensajes/documento",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "numeroDestino",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "nombre",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "ruta",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "EnviarMensajeImagen",
+    "RelativePath": "mensajes/imagen",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "numeroDestino",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "ruta",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "EnviarMensajeTexto",
+    "RelativePath": "mensajes/texto",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "numeroDestino",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "texto",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ApiWhatsapp.Controller.WhatsappWebhookController",
     "Method": "Verify",
     "RelativePath": "webhook",

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using ApiWhatsapp.Entities;
+using ApiWhatsapp.Entitties;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -12,8 +12,11 @@ namespace ApiWhatsapp.Controller
     public class WhatsappWebhookController : ControllerBase
     {
 
-        private const string VERIFY_TOKEN = "whatsapp_webhook_verification_token";
+        private const string VERIFY_TOKEN = "rUVHBwXaFGlI0OOLpC5TdByEzzDI8LGlJayhXUz0";
 
+        /// <summary>
+        /// Verifica que el endpoint sea valido
+        /// </summary>
         [HttpGet]
         public IActionResult Verify([FromQuery(Name = "hub.mode")] string mode, [FromQuery(Name = "hub.challenge")] string challenge, [FromQuery(Name = "hub.verify_token")] string verify_token)
         {
@@ -27,6 +30,9 @@ namespace ApiWhatsapp.Controller
             return Forbid();
         }
 
+        /// <summary>
+        /// Obtiene los mesajes enviados y recibidos en formato Json de meta
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult> Recive()
         {

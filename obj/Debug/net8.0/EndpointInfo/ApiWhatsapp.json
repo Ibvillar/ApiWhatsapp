@@ -5,6 +5,100 @@
     "version": "1.0"
   },
   "paths": {
+    "/mensajes/texto": {
+      "post": {
+        "tags": [
+          "Mensajes"
+        ],
+        "parameters": [
+          {
+            "name": "numeroDestino",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "texto",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mensajes/imagen": {
+      "post": {
+        "tags": [
+          "Mensajes"
+        ],
+        "parameters": [
+          {
+            "name": "numeroDestino",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "ruta",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mensajes/documento": {
+      "post": {
+        "tags": [
+          "Mensajes"
+        ],
+        "parameters": [
+          {
+            "name": "numeroDestino",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ruta",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/webhook": {
       "get": {
         "tags": [

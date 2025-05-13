@@ -8,10 +8,10 @@ namespace ApiWhatsapp.Entitties
         public int Id  { get; set; }
 
         [Required]
-        public required int IdOrigen { get; set; }
+        public required long IdOrigen { get; set; }
 
         [Required]
-        public required int IdDestino { get; set; }
+        public required long IdDestino { get; set; }
 
         public string Texto { get; set; }
 
@@ -19,5 +19,7 @@ namespace ApiWhatsapp.Entitties
         public required DateTime Fecha { get; set; }
 
         public int IdFichero { get; set; }
+
+        public bool Leido { get; set; }
     }
 }
