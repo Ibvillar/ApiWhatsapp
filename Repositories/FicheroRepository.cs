@@ -1,5 +1,6 @@
 ﻿using ApiWhatsapp.Data;
 using ApiWhatsapp.Entitties;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace ApiWhatsapp.BBDD
 {
@@ -101,6 +102,33 @@ namespace ApiWhatsapp.BBDD
             }
 
             return ficheros.FirstOrDefault(x => x.Id == Id);
+        }
+
+        /// <summary>
+        /// Construye un objeto Fichero a traves de la ruta
+        /// </summary>
+        /// <param name="ruta">Ruta del fichero a construir</param>
+        /// <returns>Devuelve un objeto del fichero en la ruta indicada</returns>
+        public Fichero ConstuirFichero(string ruta)
+        {
+            Fichero fichero = new Fichero
+            {
+                Extension = GetExtension(ruta),
+                Ruta = ruta
+            };
+
+            return fichero;
+        }
+
+        public string GetExtension(string ruta)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(ruta, out string extension))
+            {
+                extension = "application/octet-stream";
+            }
+
+            return extension;
         }
     }
 }

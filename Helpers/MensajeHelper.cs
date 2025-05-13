@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ApiWhatsapp.BBDD;
 using ApiWhatsapp.DTO;
 using Microsoft.AspNetCore.StaticFiles;
 

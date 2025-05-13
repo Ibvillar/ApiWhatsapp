@@ -1,19 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiWhatsapp.Entitties
 {
     public class Telefono
     {
         [Key]
-        public int Id { get; set; }
+        [Required]
+        [Column("ID")]
+        public required long Id { get; set; }
 
         [Required]
-        public required int Prefijo { get; set; }
-
-        [Required]
-        public required int Numero { get; set; }
-
-        [Required]
+        [Column("NOMBRE")]
         public required string Nombre { get; set; }
     }
 }

@@ -24,7 +24,12 @@ namespace ApiWhatsapp.BBDD
             try
             {
                 context.Mensajes.Add(mensaje);
-                context.SaveChangesAsync();
+                context.SaveChanges();
+
+                if (GetMensajesById(mensaje.Id) is null)
+                {
+                    return false;
+                }
 
                 return true;
             }
@@ -102,6 +107,72 @@ namespace ApiWhatsapp.BBDD
             }
 
             return mensajes.Where(x => x.IdDestino == IdDestino).ToList();
+        }
+
+        /// <summary>
+        /// Cambia un mensaje a leido
+        /// </summary>
+        /// <param name="id">Id del mensaje a cambiar</param>
+        /// <returns>-1 si hay error, 0 si no existe, 1 si se cambia correctamente</returns>
+        public int SetLeido(int id)
+        {
+            try
+            {
+                var mensaje = context.Mensajes.Where(x => x.Id == id).FirstOrDefault();
+
+                if (mensaje is null)
+                {
+                    return 0;
+                }
+
+                mensaje.Leido = true;
+                int modificado = context.SaveChanges();
+
+                return modificado;
+            } catch (Exception e) 
+            {
+                Console.WriteLine(e.ToString());
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// Construye el objeto Mensaje con formato de texto
+        /// </summary>
+        /// <returns>Devuelve un objeto a través de los parametros</returns>
+        public Mensaje ConstruirMensajeTexto(long numeroOrigen, long numeroDestino, string texto)
+        {
+            var mensaje = ConstruirMensaje(numeroOrigen, numeroDestino);
+            mensaje.Texto = texto;
+
+            return mensaje;
+        }
+
+        /// <summary>
+        /// Construye el objeto Mensaje con formato de documento o imagen
+        /// </summary>
+        /// <returns>Devuelve un objeto a través de los parametros</returns>
+        public Mensaje ConstruirMensajeArchivo(long numeroOrigen, long numeroDestino, int IdFichero)
+        {
+            var mensaje = ConstruirMensaje(numeroOrigen, numeroDestino);
+            mensaje.IdFichero = IdFichero;
+
+            return mensaje;
+        }
+
+        private Mensaje ConstruirMensaje(long numeroOrigen, long numeroDestino)
+        {
+            Mensaje mensaje = new Mensaje
+            {
+                IdOrigen = numeroOrigen,
+                IdDestino = numeroDestino,
+                Fecha = DateTime.Now,
+                Leido = false,
+                Texto = null,
+                IdFichero = -1
+            };
+
+            return mensaje;
         }
     }
 }

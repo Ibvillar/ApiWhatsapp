@@ -58,7 +58,7 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="Id">El Id del telefono</param>
         /// <returns>Devuelve el telefono, o null si no se ha encontrado</returns>
-        public Telefono GetTelefonosById(int Id)
+        public Telefono GetTelefonosById(long Id)
         {
             List<Telefono> telefonos = GetTelefonos();
             if (telefonos is null)
@@ -67,6 +67,21 @@ namespace ApiWhatsapp.BBDD
             }
 
             return telefonos.FirstOrDefault(x => x.Id == Id);
+        }
+
+        /// <summary>
+        /// Construye un objeto de Telefono
+        /// </summary>
+        /// <returns>Devuelve el objeto de Telefono</returns>
+        public Telefono ConstruirTelefono(long numero, string nombre)
+        {
+            Telefono telefono = new Telefono
+            {
+                Id = numero,
+                Nombre = nombre
+            };
+
+            return telefono;
         }
     }
 }

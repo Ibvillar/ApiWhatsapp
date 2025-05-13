@@ -4,74 +4,103 @@ using Microsoft.AspNetCore.Mvc;
 using ApiWhatsapp.EnvioMensajes;
 using System.Text;
 using System.Text.Json;
+using ApiWhatsapp.BBDD;
+using ApiWhatsapp.Data;
 
 namespace ApiWhatsapp.Controller
 {
     [ApiController]
     [Route("mensajes")]
-    public class MensajesController: ControllerBase
+    public class MensajesController : ControllerBase
     {
         private static readonly string TOKEN = "EAAHbxd02hJUBOZBOv4ZBzlQOtnojQLixKdobeqIz654prmYhyHXZBJCLXMBfyuBHt8ckCaBWILHENAmfRMDUhEoY3kHZBuaxsBmJMBAiarzNZADbLj6bVsrf288U3qdYtCXgiE5AZCfN0oFuXESDsOBmDYcB2aKE3zqnnsDYumU5T3XZAmVb8a1ZBqfUnNEmxgDp0liEh6zeo01Kei90";
+        private readonly DbWhatsapp context;
         private readonly HttpClient _httpClient;
         private MensajeHelper _mensajesHelper;
+        private FicheroRepository ficheroRepository;
+        private MensajeRepository mensajeRepository;
+        private TelefonoRepository telefonoRepository;
 
-        public MensajesController()
+        public MensajesController(DbWhatsapp context)
         {
+            this.context = context;
             _httpClient = new HttpClient();
             _mensajesHelper = new MensajeHelper(TOKEN, getUrl(""));
+            ficheroRepository = new FicheroRepository(context);
+            mensajeRepository = new MensajeRepository(context);
+            telefonoRepository = new TelefonoRepository(context);
         }
 
         [HttpPost("texto")]
         public async Task<ActionResult> EnviarMensajeTexto(long numeroDestino, string texto)
         {
+            try {
+                GuardarMensaje(34644288224, numeroDestino, texto);
+            }
+            catch (Exception e) {
+                return BadRequest(e.Message);
+            }
+
             var mensaje = _mensajesHelper.ConstruirMensajeTexto(numeroDestino, texto);
             var json = CastToJson(mensaje);
 
             var respuesta = await EnviarMensaje(json);
 
-            if (respuesta)
-            {
-                return Ok();
-            } else
-            {
+            if (!respuesta)
                 return BadRequest("Algo salio mal al enviar el mensaje");
-            }
+
+            return Ok();
+
         }
 
         [HttpPost("imagen")]
         public async Task<ActionResult> EnviarMensajeImagen(long numeroDestino, string ruta)
         {
+            try
+            {
+                GuardarMensaje(34644288224, numeroDestino, ruta);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
             var mensaje = await _mensajesHelper.ConstruirMensajeImagen(numeroDestino, ruta);
             var json = CastToJson(mensaje);
 
             var respuesta = await EnviarMensaje(json);
 
-            if (respuesta)
-            {
-                return Ok();
-            }
-            else
+            if (!respuesta)
             {
                 return BadRequest("Algo salio mal al enviar el mensaje");
             }
+
+            return Ok();
         }
 
         [HttpPost("documento")]
         public async Task<ActionResult> EnviarMensajeDocumento(long numeroDestino, string nombre, string ruta)
         {
+            try
+            {
+                GuardarMensaje(34644288224, numeroDestino, ruta);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
             var mensaje = await _mensajesHelper.ConstruirMensajeDocumento(numeroDestino, nombre, ruta);
             var json = CastToJson(mensaje);
 
             var respuesta = EnviarMensaje(json).Result;
 
-            if (respuesta)
-            {
-                return Ok();
-            }
-            else
+            if (!respuesta)
             {
                 return BadRequest("Algo salio mal al enviar el mensaje");
             }
+
+            return Ok();
         }
 
         private static string getUrl(string phonNumberId)
@@ -101,6 +130,17 @@ namespace ApiWhatsapp.Controller
                 Console.WriteLine(responseString);
                 return false;
             }
+        }
+
+        private bool GuardarMensaje(long numeroOrigen, long numeroDestino, string texto)
+        {
+            if (telefonoRepository.GetTelefonosById(numeroDestino) is null)
+            {
+                throw new Exception($"Este telefono {numeroDestino} no existe");
+            }
+
+            var mensaje = mensajeRepository.ConstruirMensajeTexto(34644288224, numeroDestino, texto);
+            return mensajeRepository.AddMensaje(mensaje);
         }
     }
 }
