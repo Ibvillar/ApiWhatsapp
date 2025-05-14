@@ -126,17 +126,32 @@ namespace ApiWhatsapp.BBDD
             return mapper.Map<Fichero>(ficheroConExtension);
         }
 
+        /// <summary>
+        /// Comprobar si existe el fichero indicado
+        /// </summary>
+        /// <returns>true en caso de que exista, false en caso contrario</returns>
         public bool ExisteFichero(Fichero fichero)
         {
-            Fichero fichero1 = context.Ficheros.Where(x => x.Ruta == fichero.Ruta 
-                                   && x.Extension.Equals(fichero.Extension)).FirstOrDefault()!;
-
-            if (fichero1 is null)
+            if (fichero is null)
             {
                 return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Obtener el fichero a traves de la ruta con la extension incluida dentro de esta
+        /// </summary>
+        /// <returns>Devuelve el fichero, null en caso de que no exista</returns>
+        public Fichero GetFicheroByRuta(string ruta)
+        {
+            string extension = GetExtension(ruta);
+
+            Fichero fichero1 = context.Ficheros.Where(x => x.Ruta == ruta
+                                   && x.Extension.Equals(extension)).FirstOrDefault()!;
+
+            return fichero1;
         }
 
         public string GetExtension(string ruta)

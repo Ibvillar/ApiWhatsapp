@@ -61,8 +61,8 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                GuardarFichero(ruta);
-                GuardarMensaje(34644288224, numeroDestino, null!, 0);
+                int idFichero = await GuardarFichero(ruta);
+                GuardarMensaje(34644288224, numeroDestino, "", idFichero);
             }
             catch (Exception e)
             {
@@ -87,23 +87,24 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                GuardarFichero(ruta);
-                GuardarMensaje(34644288224, numeroDestino, null!, 0);
+                int idFichero = await GuardarFichero(ruta);
+                GuardarMensaje(34644288224, numeroDestino, "", idFichero);
             }
             catch (Exception e)
             {
+                Console.WriteLine("1");
                 return BadRequest(e.Message);
             }
 
             var mensaje = await _mensajesHelper.ConstruirMensajeDocumento(numeroDestino, nombre, ruta);
             var json = CastToJson(mensaje);
 
-            var respuesta = EnviarMensaje(json).Result;
+           /* var respuesta = EnviarMensaje(json).Result;
 
             if (!respuesta)
             {
                 return BadRequest("Algo salio mal al enviar el mensaje");
-            }
+            } */
 
             return Ok();
         }
@@ -146,7 +147,7 @@ namespace ApiWhatsapp.Controller
 
             Mensaje mensaje;
 
-            if (texto is null)
+            if (texto is "")
             {
                 mensaje = mensajeRepository.ConstruirMensajeArchivo(34644288224, numeroDestino, idFichero);
             }
@@ -158,7 +159,7 @@ namespace ApiWhatsapp.Controller
             return mensajeRepository.AddMensaje(mensaje);
         }
 
-        private async void GuardarFichero(string ruta)
+        private async Task<int> GuardarFichero(string ruta)
         {
             try
             {
@@ -167,7 +168,14 @@ namespace ApiWhatsapp.Controller
                 if (!ficheroRepository.ExisteFichero(fichero))
                 {
                     await ficheroRepository.AddFichero(fichero);
+                } else
+                {
+                    fichero = ficheroRepository.GetFicheroByRuta(ruta);
                 }
+
+                    Console.WriteLine(fichero.Id);
+
+                return fichero.Id;
             }
             catch (Exception e)
             {
