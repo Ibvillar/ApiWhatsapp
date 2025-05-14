@@ -1,5 +1,7 @@
 ﻿using ApiWhatsapp.Data;
+using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
+using AutoMapper;
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace ApiWhatsapp.BBDD
@@ -7,10 +9,12 @@ namespace ApiWhatsapp.BBDD
     public class FicheroRepository
     {
         private readonly DbWhatsapp context;
+        private readonly IMapper mapper;
 
-        public FicheroRepository(DbWhatsapp context)
+        public FicheroRepository(DbWhatsapp context, IMapper mapper)
         {
             this.context = context;
+            this.mapper = mapper;
         }
 
         /// <summary>
@@ -18,12 +22,17 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="fichero">Fichero a agregar</param>
         /// <returns>true si se alamcena correctamente, false en caso contrario</returns>
-        public bool AddFichero(Fichero fichero)
+        public async Task<bool> AddFichero(Fichero fichero)
         {
             try
             {
                 context.Ficheros.Add(fichero);
-                context.SaveChangesAsync();
+                await context.SaveChangesAsync();
+
+                if (GetFicheroById(fichero.Id) is null)
+                {
+                    return false;
+                }
 
                 return true;
             }
@@ -109,18 +118,33 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="ruta">Ruta del fichero a construir</param>
         /// <returns>Devuelve un objeto del fichero en la ruta indicada</returns>
-        public Fichero ConstuirFichero(string ruta)
+        public Fichero ConstuirFichero(FicheroDTO ficheroDTO)
         {
-            Fichero fichero = new Fichero
-            {
-                Extension = GetExtension(ruta),
-                Ruta = ruta
-            };
+            FicheroConExtensionDTO ficheroConExtension = mapper.Map<FicheroConExtensionDTO>(ficheroDTO);
+            ficheroConExtension.Extension = GetExtension(ficheroConExtension.Ruta);
 
-            return fichero;
+            return mapper.Map<Fichero>(ficheroConExtension);
+        }
+
+        public bool ExisteFichero(Fichero fichero)
+        {
+            Fichero fichero1 = context.Ficheros.Where(x => x.Ruta == fichero.Ruta 
+                                   && x.Extension.Equals(fichero.Extension)).FirstOrDefault()!;
+
+            if (fichero1 is null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public string GetExtension(string ruta)
+        {
+            return Path.GetExtension(ruta);
+        }
+
+        public string GetMIME(string ruta)
         {
             var provider = new FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(ruta, out string extension))

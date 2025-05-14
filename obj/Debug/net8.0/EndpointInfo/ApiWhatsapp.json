@@ -5,6 +5,54 @@
     "version": "1.0"
   },
   "paths": {
+    "/fichero/agregar-fichero": {
+      "post": {
+        "tags": [
+          "Ficheros"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FicheroDTO"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FicheroDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FicheroDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FicheroDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/fichero/obtener-ficheros": {
+      "get": {
+        "tags": [
+          "Ficheros"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/mensajes/texto": {
       "post": {
         "tags": [
@@ -135,6 +183,18 @@
         }
       }
     },
+    "/telefono/obtener-telefonos": {
+      "get": {
+        "tags": [
+          "Telefonos"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/webhook": {
       "get": {
         "tags": [
@@ -183,6 +243,19 @@
   },
   "components": {
     "schemas": {
+      "FicheroDTO": {
+        "required": [
+          "ruta"
+        ],
+        "type": "object",
+        "properties": {
+          "ruta": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "TelefonoDTO": {
         "required": [
           "nombre",

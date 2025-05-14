@@ -1,7 +1,5 @@
-﻿using System.Threading.Tasks;
-using ApiWhatsapp.Data;
+﻿using ApiWhatsapp.Data;
 using ApiWhatsapp.Entitties;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ApiWhatsapp.BBDD
 {

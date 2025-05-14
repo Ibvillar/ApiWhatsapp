@@ -1,5 +1,31 @@
 [
   {
+    "ContainingType": "ApiWhatsapp.Controller.FicherosController",
+    "Method": "AgregarFichero",
+    "RelativePath": "fichero/agregar-fichero",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ficheroDTO",
+        "Type": "ApiWhatsapp.DTO.FicheroDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.FicherosController",
+    "Method": "GetFicheros",
+    "RelativePath": "fichero/obtener-ficheros",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ApiWhatsapp.Controller.MensajesController",
     "Method": "EnviarMensajeDocumento",
     "RelativePath": "mensajes/documento",
@@ -81,6 +107,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.TelefonosController",
+    "Method": "GetTelefonos",
+    "RelativePath": "telefono/obtener-telefonos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

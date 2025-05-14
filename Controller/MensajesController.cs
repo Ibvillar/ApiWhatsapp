@@ -28,7 +28,7 @@ namespace ApiWhatsapp.Controller
             this.context = context;
             _httpClient = new HttpClient();
             _mensajesHelper = new MensajeHelper(TOKEN, getUrl(""));
-            ficheroRepository = new FicheroRepository(context);
+            ficheroRepository = new FicheroRepository(context, mapper);
             mensajeRepository = new MensajeRepository(context);
             telefonoRepository = new TelefonoRepository(context, mapper);
         }
@@ -37,7 +37,7 @@ namespace ApiWhatsapp.Controller
         public async Task<ActionResult> EnviarMensajeTexto(long numeroDestino, string texto)
         {
             try {
-                GuardarMensaje(34644288224, numeroDestino, texto);
+                GuardarMensaje(34644288224, numeroDestino, texto, 0);
             }
             catch (Exception e) {
                 return BadRequest(e.Message);
@@ -60,7 +60,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                GuardarMensaje(34644288224, numeroDestino, ruta);
+                GuardarMensaje(34644288224, numeroDestino, null!, 0);
             }
             catch (Exception e)
             {
@@ -85,7 +85,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                GuardarMensaje(34644288224, numeroDestino, ruta);
+                GuardarMensaje(34644288224, numeroDestino, null!, 0);
             }
             catch (Exception e)
             {
@@ -134,14 +134,24 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        private bool GuardarMensaje(long numeroOrigen, long numeroDestino, string texto)
+        private bool GuardarMensaje(long numeroOrigen, long numeroDestino, string texto, int idFichero)
         {
             if (telefonoRepository.GetTelefonosById(numeroDestino) is null)
             {
                 throw new Exception($"El telefono {numeroDestino} no esta disponible o no existe");
             }
 
-            var mensaje = mensajeRepository.ConstruirMensajeTexto(34644288224, numeroDestino, texto);
+            Mensaje mensaje;
+
+            if (texto is null)
+            {
+                mensaje = mensajeRepository.ConstruirMensajeArchivo(34644288224, numeroDestino, idFichero);
+            }
+            else
+            {
+                mensaje = mensajeRepository.ConstruirMensajeTexto(34644288224, numeroDestino, texto);
+            }
+
             return mensajeRepository.AddMensaje(mensaje);
         }
     }
