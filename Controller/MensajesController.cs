@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.Json;
 using ApiWhatsapp.BBDD;
 using ApiWhatsapp.Data;
+using ApiWhatsapp.Entitties;
+using AutoMapper;
 
 namespace ApiWhatsapp.Controller
 {
@@ -21,14 +23,14 @@ namespace ApiWhatsapp.Controller
         private MensajeRepository mensajeRepository;
         private TelefonoRepository telefonoRepository;
 
-        public MensajesController(DbWhatsapp context)
+        public MensajesController(DbWhatsapp context, IMapper mapper)
         {
             this.context = context;
             _httpClient = new HttpClient();
             _mensajesHelper = new MensajeHelper(TOKEN, getUrl(""));
             ficheroRepository = new FicheroRepository(context);
             mensajeRepository = new MensajeRepository(context);
-            telefonoRepository = new TelefonoRepository(context);
+            telefonoRepository = new TelefonoRepository(context, mapper);
         }
 
         [HttpPost("texto")]
@@ -136,7 +138,7 @@ namespace ApiWhatsapp.Controller
         {
             if (telefonoRepository.GetTelefonosById(numeroDestino) is null)
             {
-                throw new Exception($"Este telefono {numeroDestino} no existe");
+                throw new Exception($"El telefono {numeroDestino} no esta disponible o no existe");
             }
 
             var mensaje = mensajeRepository.ConstruirMensajeTexto(34644288224, numeroDestino, texto);

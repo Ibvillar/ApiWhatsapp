@@ -68,6 +68,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "ApiWhatsapp.Controller.TelefonosController",
+    "Method": "CrearTeleofno",
+    "RelativePath": "telefono/agregar-telefono",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "telefonoDTO",
+        "Type": "ApiWhatsapp.DTO.TelefonoDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ApiWhatsapp.Controller.WhatsappWebhookController",
     "Method": "Verify",
     "RelativePath": "webhook",

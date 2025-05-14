@@ -1,28 +1,38 @@
 ﻿using ApiWhatsapp.Data;
+using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
+using ApiWhatsapp.Utilidades;
+using AutoMapper;
 
 namespace ApiWhatsapp.BBDD
 {
     public class TelefonoRepository
     {
         private readonly DbWhatsapp context;
+        private readonly IMapper mapper;
 
-        public TelefonoRepository(DbWhatsapp context)
+        public TelefonoRepository(DbWhatsapp context, IMapper mapper)
         {
             this.context = context;
+            this.mapper = mapper;
         }
 
         /// <summary>
-        /// Agrega un telefono
+        /// Agrega un telefono a la base de datos
         /// </summary>
         /// <param name="telefono">Telefono a agregar</param>
         /// <returns>true si se ha insertado correctamente, false de lo contrario</returns>
-        public bool AddTelefono(Telefono telefono)
+        public async Task<bool> AddTelefono(Telefono telefono)
         {
             try
             {
                 context.Telefonos.Add(telefono);
-                context.SaveChangesAsync();
+                await context.SaveChangesAsync();
+
+                if (GetTelefonosById(telefono.Id) is null)
+                {
+                    return false;
+                }
 
                 return true;
             }
@@ -63,25 +73,26 @@ namespace ApiWhatsapp.BBDD
             List<Telefono> telefonos = GetTelefonos();
             if (telefonos is null)
             {
-                return null;
+                return null!;
             }
 
-            return telefonos.FirstOrDefault(x => x.Id == Id);
+            return telefonos.FirstOrDefault(x => x.Id == Id)!;
         }
 
         /// <summary>
         /// Construye un objeto de Telefono
         /// </summary>
         /// <returns>Devuelve el objeto de Telefono</returns>
-        public Telefono ConstruirTelefono(long numero, string nombre)
+        public Telefono ConstruirTelefono(int numero, short prefijo, string nombre)
         {
-            Telefono telefono = new Telefono
+            TelefonoDTO telefono = new TelefonoDTO
             {
-                Id = numero,
+                Numero = numero,
+                Prefijo = prefijo,
                 Nombre = nombre
             };
 
-            return telefono;
+            return mapper.Map<Telefono>(telefono);
         }
     }
 }

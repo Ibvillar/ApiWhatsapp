@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace ApiWhatsapp.Entitties
+namespace ApiWhatsapp.DTO
 {
-    public class Telefono
+    public class TelefonoDTO
     {
-        [Column("ID")]
-        public long Id { get; set; }
-
         [Required]
         [Column("NUMERO")]
         public required int Numero { get; set; }
