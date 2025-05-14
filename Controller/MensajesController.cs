@@ -8,6 +8,7 @@ using ApiWhatsapp.BBDD;
 using ApiWhatsapp.Data;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
+using ApiWhatsapp.DTO;
 
 namespace ApiWhatsapp.Controller
 {
@@ -60,6 +61,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
+                GuardarFichero(ruta);
                 GuardarMensaje(34644288224, numeroDestino, null!, 0);
             }
             catch (Exception e)
@@ -85,6 +87,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
+                GuardarFichero(ruta);
                 GuardarMensaje(34644288224, numeroDestino, null!, 0);
             }
             catch (Exception e)
@@ -153,6 +156,23 @@ namespace ApiWhatsapp.Controller
             }
 
             return mensajeRepository.AddMensaje(mensaje);
+        }
+
+        private async void GuardarFichero(string ruta)
+        {
+            try
+            {
+                Fichero fichero = ficheroRepository.ConstuirFichero(new FicheroDTO { Ruta = ruta });
+
+                if (!ficheroRepository.ExisteFichero(fichero))
+                {
+                    await ficheroRepository.AddFichero(fichero);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 }
