@@ -28,6 +28,18 @@ namespace ApiWhatsapp.Entitties
     {
         public Metadata metadata { get; set; }
         public List<MessageWeebhook> messages { get; set; }
+        public List<Contact> contacts { get; set; }
+    }
+
+    public class Contact
+    {
+        public Profile profile { get; set; }
+        public string wa_id { get; set; }
+    }
+
+    public class Profile
+    {
+        public string name { get; set; }
     }
 
     public class Metadata
@@ -40,12 +52,28 @@ namespace ApiWhatsapp.Entitties
     {
         public string from { get; set; }
         public string id { get; set; }
-        public MessageText text { get; set; }
         public string type { get; set; }
+        public MessageText text { get; set; }
+        public MessageImage image { get; set; }
+        public MessageDocument document { get; set; }
     }
 
     public class MessageText
     {
         public string body { get; set; }
+    }
+
+    public class MessageImage
+    {
+        public string id { get; set; }
+        public string mime_type { get; set; }
+        public string caption { get; set; }
+    }
+
+    public class MessageDocument
+    {
+        public string id { get; set; }
+        public string filename { get; set; }
+        public string mime_type { get; set; }
     }
 }

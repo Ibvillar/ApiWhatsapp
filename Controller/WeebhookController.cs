@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using ApiWhatsapp.Data;
 using ApiWhatsapp.Entitties;
+using ApiWhatsapp.Helpers;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -13,6 +13,12 @@ namespace ApiWhatsapp.Controller
     {
 
         private const string VERIFY_TOKEN = "rUVHBwXaFGlI0OOLpC5TdByEzzDI8LGlJayhXUz0";
+        private WebhookHelper webhookHelper;
+
+        public WhatsappWebhookController(DbWhatsapp context, IMapper mapper)
+        {
+            webhookHelper = new WebhookHelper(context, mapper);
+        }
 
         /// <summary>
         /// Verifica que el endpoint sea valido
@@ -31,7 +37,7 @@ namespace ApiWhatsapp.Controller
         }
 
         /// <summary>
-        /// Obtiene los mesajes enviados y recibidos en formato Json de meta
+        /// Obtiene los mesajes enviados y recibidos en formato Json a traves de meta
         /// </summary>
         [HttpPost]
         public async Task<ActionResult> Recive()
@@ -45,11 +51,16 @@ namespace ApiWhatsapp.Controller
             try
             {
                 var payload = JsonConvert.DeserializeObject<WebhookPayload>(body);
+                var contact = payload?.entry.First().changes.First().value.contacts.FirstOrDefault();
 
-                var message = payload.entry[0].changes[0].value.messages?[0];
-                if (message != null)
+                var messages = payload?.entry?[0]?.changes?[0]?.value?.messages;
+                if (messages != null)
                 {
-                    Console.WriteLine($"Mensaje recibido de {message.from}: {message.text.body}");
+                    // Logica para guardar el mensaje
+                    foreach (var message in messages)
+                    {
+                        webhookHelper.GuardarMensaje(message, contact);
+                    }
                 }
             }
             catch (Exception ex)
