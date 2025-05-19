@@ -27,8 +27,24 @@
   },
   {
     "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "CambiarALeido",
+    "RelativePath": "mensajes/cambiar-a-leido/{mensajeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "mensajeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
     "Method": "EnviarMensajeDocumento",
-    "RelativePath": "mensajes/documento",
+    "RelativePath": "mensajes/enviar-documento",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -54,7 +70,7 @@
   {
     "ContainingType": "ApiWhatsapp.Controller.MensajesController",
     "Method": "EnviarMensajeImagen",
-    "RelativePath": "mensajes/imagen",
+    "RelativePath": "mensajes/enviar-imagen",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -75,7 +91,7 @@
   {
     "ContainingType": "ApiWhatsapp.Controller.MensajesController",
     "Method": "EnviarMensajeTexto",
-    "RelativePath": "mensajes/texto",
+    "RelativePath": "mensajes/enviar-texto",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -94,6 +110,64 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "GetMensajeById",
+    "RelativePath": "mensajes/obtener-mensaje/{mensajeId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "mensajeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "GetAllMensajes",
+    "RelativePath": "mensajes/obtener-mensajes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "GetMensajesByDestino",
+    "RelativePath": "mensajes/obtener-mensajes-destino/{telefonoId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "telefonoId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "GetMensajesByOrigen",
+    "RelativePath": "mensajes/obtener-mensajes-origen/{telefonoId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "telefonoId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ApiWhatsapp.Controller.TelefonosController",
     "Method": "CrearTeleofno",
     "RelativePath": "telefono/agregar-telefono",
@@ -104,6 +178,38 @@
       {
         "Name": "telefonoDTO",
         "Type": "ApiWhatsapp.DTO.TelefonoDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.TelefonosController",
+    "Method": "RemoveTelefono",
+    "RelativePath": "telefono/borrar-Telefono/{telefonoId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "telefonoId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.TelefonosController",
+    "Method": "GetTelefonoById",
+    "RelativePath": "telefono/obtener-telefono/{telefonoId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "telefonoId",
+        "Type": "System.Int64",
         "IsRequired": true
       }
     ],

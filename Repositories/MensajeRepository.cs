@@ -1,5 +1,7 @@
 ﻿using ApiWhatsapp.Data;
 using ApiWhatsapp.Entitties;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiWhatsapp.BBDD
 {
@@ -42,12 +44,12 @@ namespace ApiWhatsapp.BBDD
         /// Obtiene una lista de todos los mensajes.
         /// </summary>
         /// <returns>Lista de mensajes. Empty si no se encuentra ninguno</returns>
-        public List<Mensaje> GetMensajes()
+        public async Task<List<Mensaje>> GetMensajes()
         {
             List<Mensaje> mensajes = [];
             try
             {
-                mensajes = context.Mensajes.ToList();
+                mensajes = await context.Mensajes.ToListAsync();
 
                 return mensajes;
             }
@@ -63,9 +65,9 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="id">El Id único del mensaje.</param>
         /// <returns>El mensaje correspondiente, o null si no se encuentra.</returns>
-        public Mensaje GetMensajesById(int Id)
+        public async Task<Mensaje> GetMensajesById(int Id)
         {
-            List<Mensaje> mensajes = GetMensajes();
+            List<Mensaje> mensajes = await GetMensajes();
             if (mensajes is null)
             {
                 return null!;
@@ -79,15 +81,16 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="id">El Id del telefono saliente.</param>
         /// <returns>Lista de mensajes correspondientes. Empty si no se encuentra ninguno.</returns>
-        public List<Mensaje> GetMensajesByOrigen(int IdOrigen)
+        public async Task<List<Mensaje>> GetMensajesByOrigen(long IdOrigen)
         {
-            List<Mensaje> mensajes = GetMensajes();
+            List<Mensaje> mensajes = await GetMensajes();
             if (mensajes is null)
             {
                 return null;
             }
 
-            return mensajes.Where(x => x.IdOrigen == IdOrigen).ToList();
+            mensajes = mensajes.Where(x => x.IdOrigen == IdOrigen).ToList();
+            return mensajes;
             
         }
 
@@ -96,9 +99,9 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="id">El Id del telefono entrante.</param>
         /// <returns>Lista de mensajes correspondientes. Empty si no se encuentra ninguno.</returns>
-        public List<Mensaje> GetMensajesByDestino(int IdDestino)
+        public async Task<List<Mensaje>> GetMensajesByDestino(long IdDestino)
         {
-            List<Mensaje> mensajes = GetMensajes();
+            List<Mensaje> mensajes = await GetMensajes();
             if (mensajes is null)
             {
                 return null;
@@ -111,8 +114,8 @@ namespace ApiWhatsapp.BBDD
         /// Cambia un mensaje a leido
         /// </summary>
         /// <param name="id">Id del mensaje a cambiar</param>
-        /// <returns>-1 si hay error, 0 si no existe, 1 si se cambia correctamente</returns>
-        public int SetLeido(int id)
+        /// <returns>1 si lo cambia correctamente, 0 si no existe</returns>
+        public async Task<int> SetLeido(int id)
         {
             try
             {
@@ -124,13 +127,34 @@ namespace ApiWhatsapp.BBDD
                 }
 
                 mensaje.Leido = true;
-                int modificado = context.SaveChanges();
+                int modificado = await context.SaveChangesAsync();
 
                 return modificado;
             } catch (Exception e) 
             {
-                Console.WriteLine(e.ToString());
-                return -1;
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> RemoveMensaje(int mensajeId)
+        {
+            try
+            {
+                Mensaje mensaje = await context.Mensajes.FirstOrDefaultAsync(x => x.Id == mensajeId);
+
+                if (mensaje is null)
+                {
+                    return -1;
+                }
+
+                context.Mensajes.Remove(mensaje);
+                int result = await context.SaveChangesAsync();
+
+                return 1;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
 

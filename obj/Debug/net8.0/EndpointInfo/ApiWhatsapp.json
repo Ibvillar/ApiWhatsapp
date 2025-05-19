@@ -53,7 +53,7 @@
         }
       }
     },
-    "/mensajes/texto": {
+    "/mensajes/enviar-texto": {
       "post": {
         "tags": [
           "Mensajes"
@@ -82,7 +82,7 @@
         }
       }
     },
-    "/mensajes/imagen": {
+    "/mensajes/enviar-imagen": {
       "post": {
         "tags": [
           "Mensajes"
@@ -111,7 +111,7 @@
         }
       }
     },
-    "/mensajes/documento": {
+    "/mensajes/enviar-documento": {
       "post": {
         "tags": [
           "Mensajes"
@@ -137,6 +137,110 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mensajes/cambiar-a-leido/{mensajeId}": {
+      "put": {
+        "tags": [
+          "Mensajes"
+        ],
+        "parameters": [
+          {
+            "name": "mensajeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mensajes/obtener-mensajes": {
+      "get": {
+        "tags": [
+          "Mensajes"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mensajes/obtener-mensajes-origen/{telefonoId}": {
+      "get": {
+        "tags": [
+          "Mensajes"
+        ],
+        "parameters": [
+          {
+            "name": "telefonoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mensajes/obtener-mensajes-destino/{telefonoId}": {
+      "get": {
+        "tags": [
+          "Mensajes"
+        ],
+        "parameters": [
+          {
+            "name": "telefonoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mensajes/obtener-mensaje/{mensajeId}": {
+      "get": {
+        "tags": [
+          "Mensajes"
+        ],
+        "parameters": [
+          {
+            "name": "mensajeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -187,6 +291,52 @@
       "get": {
         "tags": [
           "Telefonos"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/telefono/obtener-telefono/{telefonoId}": {
+      "get": {
+        "tags": [
+          "Telefonos"
+        ],
+        "parameters": [
+          {
+            "name": "telefonoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/telefono/borrar-Telefono/{telefonoId}": {
+      "delete": {
+        "tags": [
+          "Telefonos"
+        ],
+        "parameters": [
+          {
+            "name": "telefonoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
         ],
         "responses": {
           "200": {
