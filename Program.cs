@@ -1,5 +1,6 @@
 using System.Text;
 using ApiWhatsapp.Data;
+using ApiWhatsapp.Helpers;
 using ApiWhatsapp.Swagger;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,7 +13,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddDbContext<DbWhatsapp>(opciones =>
-                    opciones.UseSqlServer("name=WhatsappConection"));
+                    opciones.UseSqlServer("name=WhatsappConection"), ServiceLifetime.Scoped);
 
 builder.Services.AddAuthentication().AddJwtBearer(opciones =>
 {

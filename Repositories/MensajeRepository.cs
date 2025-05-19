@@ -17,12 +17,12 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="mensaje">Mensaje para agregar</param>
         /// <returns>true si lo ha insertado correctamente, false de lo contrario</returns>
-        public bool AddMensaje(Mensaje mensaje)
+        public async Task<bool> AddMensaje(Mensaje mensaje)
         {
             try
             {
                 context.Mensajes.Add(mensaje);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 if (GetMensajesById(mensaje.Id) is null)
                 {
@@ -166,7 +166,7 @@ namespace ApiWhatsapp.BBDD
                 IdDestino = numeroDestino,
                 Fecha = DateTime.Now,
                 Leido = false,
-                Texto = null,
+                Texto = "",
                 IdFichero = -1
             };
 

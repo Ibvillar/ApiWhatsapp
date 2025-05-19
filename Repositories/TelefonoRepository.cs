@@ -94,5 +94,22 @@ namespace ApiWhatsapp.BBDD
 
             return mapper.Map<Telefono>(telefono);
         }
+
+        public async Task<bool> RemoveTelefono(long telefonoId)
+        {
+            var telefono = context.Telefonos.FirstOrDefault(x => x.Id == telefonoId);
+
+            if (telefono != null)
+            {
+                context.Telefonos.Remove(telefono);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Teléfono no encontrado.");
+                return false;
+            }
+        }
     }
 }

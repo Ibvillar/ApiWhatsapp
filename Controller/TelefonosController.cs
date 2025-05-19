@@ -3,11 +3,8 @@ using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
-using Azure;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApiWhatsapp.Controller
 {
@@ -64,6 +61,46 @@ namespace ApiWhatsapp.Controller
                 }
 
                 return Ok(telefonos);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("obtener-telefono/{telefonoId}")]
+        public async Task<ActionResult> GetTelefonoById(long telefonoId)
+        {
+            try
+            {
+                Telefono telefono = telefonoRepository.GetTelefonosById(telefonoId);
+
+                if (telefono is null)
+                {
+                    return NotFound("Este telefono no existe");
+                }
+
+                return Ok(telefono);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("borrar-Telefono/{telefonoId}")]
+        public async Task<ActionResult> RemoveTelefono(long telefonoId)
+        {
+            try
+            {
+                bool exito = await telefonoRepository.RemoveTelefono(telefonoId);
+
+                if (exito)
+                {
+                    return Ok("Se ha eliminado correctamente");
+                }
+
+                return NotFound("Este telefono no existe");
             }
             catch (Exception e)
             {

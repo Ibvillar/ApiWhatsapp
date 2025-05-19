@@ -59,13 +59,13 @@ namespace ApiWhatsapp.Controller
                     // Logica para guardar el mensaje
                     foreach (var message in messages)
                     {
-                        webhookHelper.GuardarMensaje(message, contact);
+                        await webhookHelper.GuardarMensaje(message, contact!.profile.name);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error procesando webhook: {ex.Message}");
+                Console.WriteLine($"Error procesando webhook: {ex}");
             }
 
             return Ok();

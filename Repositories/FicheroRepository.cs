@@ -3,6 +3,7 @@ using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiWhatsapp.BBDD
 {
@@ -26,7 +27,7 @@ namespace ApiWhatsapp.BBDD
         {
             try
             {
-                context.Ficheros.Add(fichero);
+                await context.Ficheros.AddAsync(fichero);
                 await context.SaveChangesAsync();
 
                 if (GetFicheroById(fichero.Id) is null)

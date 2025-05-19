@@ -1,10 +1,9 @@
 ﻿using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
-using AutoMapper;
 
 namespace ApiWhatsapp.Utilidades
 {
-    public class AutoMapperProfiles: Profile
+    public class AutoMapperProfiles: AutoMapper.Profile
     {
         public AutoMapperProfiles()
         {

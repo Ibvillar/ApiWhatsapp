@@ -1,13 +1,10 @@
-﻿using System.Diagnostics;
-using System.Net.Http.Headers;
-using System.Net.Http;
+﻿using System.Net.Http.Headers;
 using ApiWhatsapp.BBDD;
 using ApiWhatsapp.Data;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
-using Azure.Core;
 using ApiWhatsapp.DTO;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ApiWhatsapp.Helpers
 {
@@ -17,36 +14,38 @@ namespace ApiWhatsapp.Helpers
         private MensajeRepository mensajeRepository;
         private FicheroRepository ficheroRepository;
         private readonly HttpClient _httpClient;
-        private readonly string TOKEN = "";
+        private readonly string TOKEN = "EAAHbxd02hJUBOZBOv4ZBzlQOtnojQLixKdobeqIz654prmYhyHXZBJCLXMBfyuBHt8ckCaBWILHENAmfRMDUhEoY3kHZBuaxsBmJMBAiarzNZADbLj6bVsrf288U3qdYtCXgiE5AZCfN0oFuXESDsOBmDYcB2aKE3zqnnsDYumU5T3XZAmVb8a1ZBqfUnNEmxgDp0liEh6zeo01Kei90";
+        private readonly DbWhatsapp context;
 
         public WebhookHelper(DbWhatsapp context, IMapper mapper) 
         {
+            this.context = context;
             telefonoRepository = new TelefonoRepository(context, mapper);
             mensajeRepository = new MensajeRepository(context);
             ficheroRepository = new FicheroRepository(context, mapper);
             _httpClient = new HttpClient();
         }
 
-        public async void GuardarMensaje(MessageWeebhook mensaje, string nombre)
+        public async Task GuardarMensaje(MessageWeebhook mensaje, string nombre)
         {
             await ObtenerTelefono(mensaje, nombre);
-            GetMensajePorTipo(mensaje);
+            await GetMensajePorTipo(mensaje);
         }
 
-        private void GetMensajePorTipo(MessageWeebhook mensaje)
+        private async Task GetMensajePorTipo(MessageWeebhook mensaje)
         {
             switch (mensaje.type)
             {
                 case "text":
-                    GuardarMensajeTexto(mensaje);
+                    await GuardarMensajeTexto(mensaje);
                     break;
 
                 case "image":
-                    GuardarMensajeArchivo(mensaje);
+                    await GuardarMensajeArchivo(mensaje);
                     break;
 
                 case "document":
-                    GuardarMensajeArchivo(mensaje);
+                    await GuardarMensajeArchivo(mensaje);
                     break;
 
                 default:
@@ -55,10 +54,10 @@ namespace ApiWhatsapp.Helpers
             }
         }
 
-        private async void GuardarMensajeArchivo(MessageWeebhook mensaje)
+        private async Task GuardarMensajeArchivo(MessageWeebhook mensaje)
         {
             string ruta = "";
-            if (mensaje.image.id.IsNullOrEmpty())
+            if (mensaje.image is null)
             {
                 ruta = await DescargarArchivoDesdeMetaAsync(mensaje.document.id);
             } else
@@ -66,17 +65,25 @@ namespace ApiWhatsapp.Helpers
                 ruta = await DescargarArchivoDesdeMetaAsync(mensaje.image.id);
             }
 
-            FicheroDTO ficheroDTO = new FicheroDTO { Ruta = ruta};
-            Fichero fichero = ficheroRepository.ConstuirFichero(ficheroDTO);
-            await ficheroRepository.AddFichero(fichero);
-            Mensaje mensajeArchivo = mensajeRepository.ConstruirMensajeArchivo(long.Parse(mensaje.from), 34644288224, 2);
-            mensajeRepository.AddMensaje(mensajeArchivo);
+            try
+            {
+                FicheroDTO ficheroDTO = new FicheroDTO { Ruta = ruta };
+                Fichero fichero = ficheroRepository.ConstuirFichero(ficheroDTO);
+                await ficheroRepository.AddFichero(fichero);
+                Mensaje mensajeArchivo = mensajeRepository.ConstruirMensajeArchivo(long.Parse(mensaje.from), 34644288224, fichero.Id);
+                await mensajeRepository.AddMensaje(mensajeArchivo);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            
         }
 
-        private void GuardarMensajeTexto(MessageWeebhook mensaje)
+        private async Task GuardarMensajeTexto(MessageWeebhook mensaje)
         {
-            Mensaje mensajeTexto = mensajeRepository.ConstruirMensajeTexto(long.Parse(mensaje.from), 34644288224, mensaje.text.ToString()!);
-            mensajeRepository.AddMensaje(mensajeTexto);
+            Mensaje mensajeTexto = mensajeRepository.ConstruirMensajeTexto(long.Parse(mensaje.from), 34644288224, mensaje.text.body);
+            await mensajeRepository.AddMensaje(mensajeTexto);
         }
 
         private async Task<Telefono> ObtenerTelefono(MessageWeebhook webhook, string nombre)
@@ -86,7 +93,13 @@ namespace ApiWhatsapp.Helpers
             if (telefono is null)
             {
                 var numero = DetectarPrefijo(long.Parse(webhook.from));
-                telefono = telefonoRepository.ConstruirTelefono(numero!.Value.numeroSinPrefijo, numero.Value.prefijo, nombre);
+
+                if (!numero.HasValue)
+                {
+                    throw new Exception("El numero es nulo");
+                }
+
+                telefono = telefonoRepository.ConstruirTelefono(numero.Value.numeroSinPrefijo, numero.Value.prefijo, nombre);
                 await telefonoRepository.AddTelefono(telefono);
             }
 
@@ -97,15 +110,17 @@ namespace ApiWhatsapp.Helpers
         {
             string numeroStr = numeroCompleto.ToString();
 
-            var prefijos = new List<short> { 34, 52, 54, 57, 58, 51, 56 };
+            var prefijos = context.Prefijos.ToList();
 
-            foreach (var pref in prefijos.OrderByDescending(p => p.ToString().Length))
+            foreach (var pref in prefijos.OrderByDescending(p => p.ToString()!.Length))
             {
-                if (numeroStr.StartsWith(pref.ToString()))
+                Console.WriteLine(pref.Prefijo);
+                Console.WriteLine(numeroStr);
+                if (numeroStr.StartsWith(pref.Prefijo))
                 {
-                    string sinPrefijoStr = numeroStr.Substring(pref.ToString().Length);
+                    string sinPrefijoStr = numeroStr.Substring(pref.Prefijo!.Length);
                     if (int.TryParse(sinPrefijoStr, out int numeroSinPrefijo))
-                        return (pref, numeroSinPrefijo);
+                        return (short.Parse(pref.Prefijo), numeroSinPrefijo);
                 }
             }
 
@@ -117,6 +132,8 @@ namespace ApiWhatsapp.Helpers
             try
             {
                 // Paso 1: Obtener la URL de descarga del archivo
+                Console.WriteLine(mediaId);
+                Console.WriteLine(TOKEN);
                 string metadataUrl = $"https://graph.facebook.com/v22.0/{mediaId}";
                 var requestMessage = new HttpRequestMessage(HttpMethod.Get, metadataUrl);
                 requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", TOKEN);

@@ -138,7 +138,7 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        private bool GuardarMensaje(long numeroOrigen, long numeroDestino, string texto, int idFichero)
+        private async Task<bool> GuardarMensaje(long numeroOrigen, long numeroDestino, string texto, int idFichero)
         {
             if (telefonoRepository.GetTelefonosById(numeroDestino) is null)
             {
@@ -156,7 +156,7 @@ namespace ApiWhatsapp.Controller
                 mensaje = mensajeRepository.ConstruirMensajeTexto(34644288224, numeroDestino, texto);
             }
 
-            return mensajeRepository.AddMensaje(mensaje);
+            return await mensajeRepository.AddMensaje(mensaje);
         }
 
         private async Task<int> GuardarFichero(string ruta)
