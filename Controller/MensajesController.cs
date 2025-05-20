@@ -293,7 +293,7 @@ namespace ApiWhatsapp.Controller
                     await ficheroRepository.AddFichero(fichero);
                 } else
                 {
-                    fichero = ficheroRepository.GetFicheroByRuta(ruta);
+                    fichero = await ficheroRepository.GetFicheroByRuta(ruta);
                 }
 
                     Console.WriteLine(fichero.Id);

@@ -53,6 +53,51 @@
         }
       }
     },
+    "/fichero/obtener-fichero-by-ruta/{ruta}": {
+      "get": {
+        "tags": [
+          "Ficheros"
+        ],
+        "parameters": [
+          {
+            "name": "ruta",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/fichero/obtener-fichero-by-id/{id}": {
+      "get": {
+        "tags": [
+          "Ficheros"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/mensajes/enviar-texto": {
       "post": {
         "tags": [
@@ -230,6 +275,29 @@
     },
     "/mensajes/obtener-mensaje/{mensajeId}": {
       "get": {
+        "tags": [
+          "Mensajes"
+        ],
+        "parameters": [
+          {
+            "name": "mensajeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mensajes/eliminar-mensaje/{mensajeId}": {
+      "delete": {
         "tags": [
           "Mensajes"
         ],

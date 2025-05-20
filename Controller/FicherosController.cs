@@ -69,6 +69,46 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        [HttpGet("obtener-fichero-by-ruta/{ruta}")]
+        public async Task<ActionResult> GetFicherosByRuta(string ruta)
+        {
+            try
+            {
+                Fichero fichero = await ficheroRepository.GetFicheroByRuta(ruta);
+
+                if (fichero is null)
+                {
+                    return NotFound($"No se ha encontrado ningun fichero en la ruta: {ruta}");
+                }
+
+                return Ok(fichero);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("obtener-fichero-by-id/{id}")]
+        public ActionResult GetFicheroById(int id)
+        {
+            try
+            {
+                Fichero fichero = ficheroRepository.GetFicheroById(id);
+
+                if (fichero is null)
+                {
+                    return NotFound("Este fichero no existe");
+                }
+
+                return Ok(fichero);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         private string ValidarRuta(string ruta)
         {
             if (string.IsNullOrWhiteSpace(ruta))

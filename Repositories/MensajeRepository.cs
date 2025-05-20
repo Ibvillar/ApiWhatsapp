@@ -86,7 +86,7 @@ namespace ApiWhatsapp.BBDD
             List<Mensaje> mensajes = await GetMensajes();
             if (mensajes is null)
             {
-                return null;
+                return null!;
             }
 
             mensajes = mensajes.Where(x => x.IdOrigen == IdOrigen).ToList();
@@ -104,7 +104,7 @@ namespace ApiWhatsapp.BBDD
             List<Mensaje> mensajes = await GetMensajes();
             if (mensajes is null)
             {
-                return null;
+                return null!;
             }
 
             return mensajes.Where(x => x.IdDestino == IdDestino).ToList();
@@ -140,7 +140,7 @@ namespace ApiWhatsapp.BBDD
         {
             try
             {
-                Mensaje mensaje = await context.Mensajes.FirstOrDefaultAsync(x => x.Id == mensajeId);
+                Mensaje? mensaje = await context.Mensajes.FirstOrDefaultAsync(x => x.Id == mensajeId);
 
                 if (mensaje is null)
                 {

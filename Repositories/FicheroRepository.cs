@@ -94,7 +94,7 @@ namespace ApiWhatsapp.BBDD
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return null;
+                return null!;
             }
         }
 
@@ -108,10 +108,10 @@ namespace ApiWhatsapp.BBDD
             List<Fichero> ficheros = GetFicheros();
             if (ficheros is null)
             {
-                return null;
+                return null!;
             }
 
-            return ficheros.FirstOrDefault(x => x.Id == Id);
+            return ficheros.FirstOrDefault(x => x.Id == Id)!;
         }
 
         /// <summary>
@@ -145,14 +145,14 @@ namespace ApiWhatsapp.BBDD
         /// Obtener el fichero a traves de la ruta con la extension incluida dentro de esta
         /// </summary>
         /// <returns>Devuelve el fichero, null en caso de que no exista</returns>
-        public Fichero GetFicheroByRuta(string ruta)
+        public async Task<Fichero> GetFicheroByRuta(string ruta)
         {
             string extension = GetExtension(ruta);
 
-            Fichero fichero1 = context.Ficheros.Where(x => x.Ruta == ruta
-                                   && x.Extension.Equals(extension)).FirstOrDefault()!;
+            Fichero? fichero1 = await context.Ficheros.Where(x => x.Ruta == ruta
+                                   && x.Extension.Equals(extension)).FirstOrDefaultAsync();
 
-            return fichero1;
+            return fichero1!;
         }
 
         public string GetExtension(string ruta)
@@ -163,7 +163,7 @@ namespace ApiWhatsapp.BBDD
         public string GetMIME(string ruta)
         {
             var provider = new FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(ruta, out string extension))
+            if (!provider.TryGetContentType(ruta, out string? extension))
             {
                 extension = "application/octet-stream";
             }
