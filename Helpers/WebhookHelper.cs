@@ -19,19 +19,23 @@ namespace ApiWhatsapp.Helpers
         private readonly HttpClient _httpClient;
         private readonly string TOKEN = "EAAHbxd02hJUBOZBOv4ZBzlQOtnojQLixKdobeqIz654prmYhyHXZBJCLXMBfyuBHt8ckCaBWILHENAmfRMDUhEoY3kHZBuaxsBmJMBAiarzNZADbLj6bVsrf288U3qdYtCXgiE5AZCfN0oFuXESDsOBmDYcB2aKE3zqnnsDYumU5T3XZAmVb8a1ZBqfUnNEmxgDp0liEh6zeo01Kei90";
         private readonly DbWhatsapp context;
+        private readonly IConfiguration _configuration;
+        private readonly string ruta;
 
         /// <summary>
         /// Constructor de la clase WebhookHelper.
         /// </summary>
         /// <param name="context">Contexto de base de datos</param>
         /// <param name="mapper">Instancia de AutoMapper</param>
-        public WebhookHelper(DbWhatsapp context, IMapper mapper)
+        public WebhookHelper(DbWhatsapp context, IMapper mapper, IConfiguration configuration)
         {
             this.context = context;
             telefonoRepository = new TelefonoRepository(context, mapper);
             mensajeRepository = new MensajeRepository(context);
             ficheroRepository = new FicheroRepository(context, mapper);
             _httpClient = new HttpClient();
+            _configuration = configuration;
+            ruta = _configuration["RutaFicheros"]!;
         }
 
         /// <summary>
@@ -73,8 +77,8 @@ namespace ApiWhatsapp.Helpers
         private async Task GuardarMensajeArchivo(MessageWeebhook mensaje)
         {
             string ruta = mensaje.image is null
-                ? await DescargarArchivoDesdeMetaAsync(mensaje.document.id)
-                : await DescargarArchivoDesdeMetaAsync(mensaje.image.id);
+                ? await DescargarArchivoDesdeMetaAsync(mensaje.document.id, mensaje.document.filename)
+                : await DescargarArchivoDesdeMetaAsync(mensaje.image.id, mensaje.document.filename);
 
             try
             {
@@ -160,7 +164,7 @@ namespace ApiWhatsapp.Helpers
         /// </summary>
         /// <param name="mediaId">ID del media en la API de Meta</param>
         /// <returns>Ruta local del archivo guardado</returns>
-        public async Task<string> DescargarArchivoDesdeMetaAsync(string mediaId)
+        public async Task<string> DescargarArchivoDesdeMetaAsync(string mediaId, string nombreArchivo)
         {
             try
             {
@@ -185,14 +189,38 @@ namespace ApiWhatsapp.Helpers
 
                 string extension = mimeType switch
                 {
+                    // Imágenes
                     "image/jpeg" => ".jpg",
                     "image/png" => ".png",
+                    "image/webp" => ".webp",
+
+                    // Documentos
                     "application/pdf" => ".pdf",
+                    "application/msword" => ".doc",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => ".docx",
+                    "application/vnd.ms-excel" => ".xls",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => ".xlsx",
+                    "application/vnd.ms-powerpoint" => ".ppt",
+                    "application/vnd.openxmlformats-officedocument.presentationml.presentation" => ".pptx",
+                    "text/plain" => ".txt",
+
+                    // Audio
+                    "audio/aac" => ".aac",
+                    "audio/mpeg" => ".mp3",
+                    "audio/mp4" => ".mp4",
+                    "audio/amr" => ".amr",
+                    "audio/ogg" => ".ogg",
+                    "audio/opus" => ".opus",
+
+                    // Video
+                    "video/mp4" => ".mp4",
+                    "video/3gpp" => ".3gp",
+
+                    // Valor por defecto
                     _ => ".bin"
                 };
 
-                string fileName = $"{Guid.NewGuid()}{extension}";
-                string fullPath = Path.Combine(@"C:\Proyectos\ApiWhatsapp\FicherosWebHook", fileName);
+                string fullPath = Path.Combine(ruta, nombreArchivo);
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
 
                 await File.WriteAllBytesAsync(fullPath, fileBytes);

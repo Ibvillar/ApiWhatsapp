@@ -19,7 +19,7 @@ namespace ApiWhatsapp.Controller
     [Route("mensajes")]
     public class MensajesController : ControllerBase
     {
-        private static readonly string TOKEN = "TU_TOKEN"; // ⚠ Reemplazar en producción
+        private static readonly string TOKEN = "EAAHbxd02hJUBOZBOv4ZBzlQOtnojQLixKdobeqIz654prmYhyHXZBJCLXMBfyuBHt8ckCaBWILHENAmfRMDUhEoY3kHZBuaxsBmJMBAiarzNZADbLj6bVsrf288U3qdYtCXgiE5AZCfN0oFuXESDsOBmDYcB2aKE3zqnnsDYumU5T3XZAmVb8a1ZBqfUnNEmxgDp0liEh6zeo01Kei90";
         private readonly HttpClient _httpClient;
         private MensajeHelper _mensajesHelper;
         private FicheroRepository ficheroRepository;
