@@ -8,17 +8,28 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ApiWhatsapp.Controller
 {
+    /// <summary>
+    /// Controlador para operaciones relacionadas con teléfonos.
+    /// </summary>
     [ApiController]
     [Route("telefono")]
-    public class TelefonosController: ControllerBase
+    public class TelefonosController : ControllerBase
     {
         private TelefonoRepository telefonoRepository;
 
+        /// <summary>
+        /// Constructor del controlador de teléfonos.
+        /// </summary>
         public TelefonosController(DbWhatsapp context, IMapper mapper)
         {
             telefonoRepository = new TelefonoRepository(context, mapper);
         }
 
+        /// <summary>
+        /// Agrega un nuevo teléfono a la base de datos.
+        /// </summary>
+        /// <param name="telefonoDTO">Objeto DTO con los datos del teléfono.</param>
+        /// <returns>Resultado de la operación.</returns>
         [HttpPost("agregar-telefono")]
         public async Task<ActionResult> CrearTeleofno(TelefonoDTO telefonoDTO)
         {
@@ -35,12 +46,12 @@ namespace ApiWhatsapp.Controller
 
                 if (telefonoRepository.GetTelefonosById(telefono.Id) is not null)
                 {
-                    return BadRequest("Este telefono ya existe");
+                    return BadRequest("Este teléfono ya existe");
                 }
 
                 await telefonoRepository.AddTelefono(telefono);
 
-                return Ok("Telefono creado correctamente");
+                return Ok("Teléfono creado correctamente");
             }
             catch (Exception e)
             {
@@ -48,6 +59,10 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Obtiene la lista de teléfonos registrados.
+        /// </summary>
+        /// <returns>Lista de teléfonos o un mensaje de error.</returns>
         [HttpGet("obtener-telefonos")]
         public async Task<ActionResult> GetTelefonos()
         {
@@ -57,7 +72,7 @@ namespace ApiWhatsapp.Controller
 
                 if (telefonos.IsNullOrEmpty())
                 {
-                    return BadRequest("No hay telefonos dispnibles");
+                    return BadRequest("No hay teléfonos disponibles");
                 }
 
                 return Ok(telefonos);
@@ -68,6 +83,11 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Obtiene un teléfono específico por su ID.
+        /// </summary>
+        /// <param name="telefonoId">ID del teléfono</param>
+        /// <returns>Objeto teléfono o mensaje de error.</returns>
         [HttpGet("obtener-telefono/{telefonoId}")]
         public async Task<ActionResult> GetTelefonoById(long telefonoId)
         {
@@ -77,7 +97,7 @@ namespace ApiWhatsapp.Controller
 
                 if (telefono is null)
                 {
-                    return NotFound("Este telefono no existe");
+                    return NotFound("Este teléfono no existe");
                 }
 
                 return Ok(telefono);
@@ -88,7 +108,12 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        [HttpDelete("borrar-Telefono/{telefonoId}")]
+        /// <summary>
+        /// Elimina un teléfono por su ID.
+        /// </summary>
+        /// <param name="telefonoId">ID del teléfono a eliminar</param>
+        /// <returns>Resultado de la operación.</returns>
+        [HttpDelete("borrar-telefono/{telefonoId}")]
         public async Task<ActionResult> RemoveTelefono(long telefonoId)
         {
             try
@@ -100,7 +125,7 @@ namespace ApiWhatsapp.Controller
                     return Ok("Se ha eliminado correctamente");
                 }
 
-                return NotFound("Este telefono no existe");
+                return NotFound("Este teléfono no existe");
             }
             catch (Exception e)
             {
@@ -108,23 +133,26 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Valida los campos del DTO de teléfono.
+        /// </summary>
+        /// <param name="telefono">Objeto DTO del teléfono</param>
+        /// <returns>Mensaje de error si hay errores, null si es válido</returns>
         private string ValidarTelefono(TelefonoDTO telefono)
         {
-            string mensajeError = string.Empty;
-
             // Validar prefijo (ej: códigos de país suelen estar entre 1 y 999)
             if (telefono.Prefijo <= 0 || telefono.Prefijo > 999)
             {
                 return "El prefijo debe estar entre 1 y 999.";
             }
 
-            // Validar número (puede variar, aquí usamos un rango típico de longitud)
+            // Validar número (debe ser mayor a 0)
             if (telefono.Numero <= 0)
             {
                 return "El número de teléfono debe ser mayor que cero.";
             }
 
-            // Validar longitud del número (por ejemplo, entre 6 y 10 dígitos)
+            // Validar longitud del número (por ejemplo, entre 6 y 9 dígitos)
             int longitudNumero = telefono.Numero.ToString().Length;
             if (longitudNumero < 6 || longitudNumero > 9)
             {

@@ -1,29 +1,40 @@
-﻿using System.IO;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading.Tasks;
-using ApiWhatsapp.BBDD;
 using ApiWhatsapp.DTO;
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace ApiWhatsapp.EnvioMensajes
 {
+    /// <summary>
+    /// Clase auxiliar para construir y enviar mensajes de WhatsApp.
+    /// </summary>
     public class MensajeHelper
     {
         private HttpClient _httpClient;
         private readonly string _token;
         private readonly string url;
 
-        public MensajeHelper(string _token, string url) 
+        /// <summary>
+        /// Constructor de la clase MensajeHelper.
+        /// </summary>
+        /// <param name="_token">Token de autenticación de la API de WhatsApp</param>
+        /// <param name="url">URL base del servicio de WhatsApp</param>
+        public MensajeHelper(string _token, string url)
         {
             _httpClient = new HttpClient();
             this._token = _token;
             this.url = url;
         }
 
+        /// <summary>
+        /// Construye un mensaje de texto para WhatsApp.
+        /// </summary>
+        /// <param name="numeroDestino">Número del destinatario</param>
+        /// <param name="texto">Contenido del mensaje</param>
+        /// <returns>Objeto MensajeTexto</returns>
         public MensajeTexto ConstruirMensajeTexto(long numeroDestino, string texto)
         {
-            var mensajeTexto = new MensajeTexto
+            return new MensajeTexto
             {
                 MessagingProduct = "whatsapp",
                 TelefonoDestino = numeroDestino.ToString(),
@@ -33,16 +44,20 @@ namespace ApiWhatsapp.EnvioMensajes
                     Body = texto
                 }
             };
-
-            return mensajeTexto;
         }
 
+        /// <summary>
+        /// Construye un mensaje de imagen para WhatsApp.
+        /// </summary>
+        /// <param name="numeroDestino">Número del destinatario</param>
+        /// <param name="ruta">Ruta del archivo de imagen</param>
+        /// <returns>Objeto MensajeImagen</returns>
         public async Task<MensajeImagen> ConstruirMensajeImagen(long numeroDestino, string ruta)
         {
             var mediaId = await GetIdFromFichero(ruta);
             Console.WriteLine(mediaId);
 
-            var mensajeImagen = new MensajeImagen
+            return new MensajeImagen
             {
                 MessagingProduct = "whatsapp",
                 TelefonoDestino = numeroDestino.ToString(),
@@ -52,16 +67,21 @@ namespace ApiWhatsapp.EnvioMensajes
                     Id = mediaId
                 }
             };
-
-            return mensajeImagen;
         }
 
+        /// <summary>
+        /// Construye un mensaje de documento para WhatsApp.
+        /// </summary>
+        /// <param name="numeroDestino">Número del destinatario</param>
+        /// <param name="nombre">Nombre del archivo</param>
+        /// <param name="ruta">Ruta del archivo</param>
+        /// <returns>Objeto MensajeDocumento</returns>
         public async Task<MensajeDocumento> ConstruirMensajeDocumento(long numeroDestino, string nombre, string ruta)
         {
             var mediaId = await GetIdFromFichero(ruta);
             Console.WriteLine($"ID del archivo subido: {mediaId}");
 
-            var mensajeDocumento = new MensajeDocumento
+            return new MensajeDocumento
             {
                 MessagingProduct = "whatsapp",
                 TelefonoDestino = numeroDestino.ToString(),
@@ -72,10 +92,16 @@ namespace ApiWhatsapp.EnvioMensajes
                     Nombre = nombre
                 }
             };
-
-            return mensajeDocumento;
         }
 
+        /// <summary>
+        /// Sube un archivo al servidor de WhatsApp y obtiene el ID del media.
+        /// </summary>
+        /// <param name="ruta">Ruta local del archivo</param>
+        /// <returns>ID del archivo subido</returns>
+        /// <exception cref="FileNotFoundException">Si el archivo no existe</exception>
+        /// <exception cref="InvalidOperationException">Si el archivo está vacío</exception>
+        /// <exception cref="Exception">Si ocurre un error en la subida</exception>
         private async Task<string> GetIdFromFichero(string ruta)
         {
             var fileInfo = new FileInfo(ruta);
@@ -112,6 +138,11 @@ namespace ApiWhatsapp.EnvioMensajes
             throw new Exception("No se pudo obtener el ID del archivo subido.");
         }
 
+        /// <summary>
+        /// Obtiene el tipo MIME basado en la extensión del archivo.
+        /// </summary>
+        /// <param name="ruta">Ruta del archivo</param>
+        /// <returns>Cadena con el tipo MIME</returns>
         private string GetMimeType(string ruta)
         {
             var provider = new FileExtensionContentTypeProvider();

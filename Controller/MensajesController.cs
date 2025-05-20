@@ -1,5 +1,4 @@
-﻿
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using ApiWhatsapp.EnvioMensajes;
 using System.Text;
@@ -13,17 +12,23 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ApiWhatsapp.Controller
 {
+    /// <summary>
+    /// Controlador para manejar el envío y la gestión de mensajes vía WhatsApp.
+    /// </summary>
     [ApiController]
     [Route("mensajes")]
     public class MensajesController : ControllerBase
     {
-        private static readonly string TOKEN = "EAAHbxd02hJUBOZBOv4ZBzlQOtnojQLixKdobeqIz654prmYhyHXZBJCLXMBfyuBHt8ckCaBWILHENAmfRMDUhEoY3kHZBuaxsBmJMBAiarzNZADbLj6bVsrf288U3qdYtCXgiE5AZCfN0oFuXESDsOBmDYcB2aKE3zqnnsDYumU5T3XZAmVb8a1ZBqfUnNEmxgDp0liEh6zeo01Kei90";
+        private static readonly string TOKEN = "TU_TOKEN"; // ⚠ Reemplazar en producción
         private readonly HttpClient _httpClient;
         private MensajeHelper _mensajesHelper;
         private FicheroRepository ficheroRepository;
         private MensajeRepository mensajeRepository;
         private TelefonoRepository telefonoRepository;
 
+        /// <summary>
+        /// Constructor del controlador de mensajes.
+        /// </summary>
         public MensajesController(DbWhatsapp context, IMapper mapper)
         {
             _httpClient = new HttpClient();
@@ -33,13 +38,20 @@ namespace ApiWhatsapp.Controller
             telefonoRepository = new TelefonoRepository(context, mapper);
         }
 
+        /// <summary>
+        /// Envía un mensaje de texto a un número específico.
+        /// </summary>
+        /// <param name="numeroDestino">Número del destinatario</param>
+        /// <param name="texto">Texto del mensaje</param>
         [HttpPost("enviar-texto")]
         public async Task<ActionResult> EnviarMensajeTexto(long numeroDestino, string texto)
         {
-            try {
+            try
+            {
                 await GuardarMensaje(34644288224, numeroDestino, texto, -1);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 return BadRequest(e.Message);
             }
 
@@ -48,13 +60,14 @@ namespace ApiWhatsapp.Controller
 
             var respuesta = await EnviarMensaje(json);
 
-            if (!respuesta)
-                return BadRequest("Algo salio mal al enviar el mensaje");
-
-            return Ok();
-
+            return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
 
+        /// <summary>
+        /// Envía una imagen a un número específico.
+        /// </summary>
+        /// <param name="numeroDestino">Número del destinatario</param>
+        /// <param name="ruta">Ruta del fichero de imagen</param>
         [HttpPost("enviar-imagen")]
         public async Task<ActionResult> EnviarMensajeImagen(long numeroDestino, string ruta)
         {
@@ -72,15 +85,15 @@ namespace ApiWhatsapp.Controller
             var json = CastToJson(mensaje);
 
             var respuesta = await EnviarMensaje(json);
-
-            if (!respuesta)
-            {
-                return BadRequest("Algo salio mal al enviar el mensaje");
-            }
-
-            return Ok();
+            return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
 
+        /// <summary>
+        /// Envía un documento a un número específico.
+        /// </summary>
+        /// <param name="numeroDestino">Número del destinatario</param>
+        /// <param name="nombre">Nombre del documento</param>
+        /// <param name="ruta">Ruta del documento</param>
         [HttpPost("enviar-documento")]
         public async Task<ActionResult> EnviarMensajeDocumento(long numeroDestino, string nombre, string ruta)
         {
@@ -91,23 +104,20 @@ namespace ApiWhatsapp.Controller
             }
             catch (Exception e)
             {
-                Console.WriteLine("1");
                 return BadRequest(e.Message);
             }
 
             var mensaje = await _mensajesHelper.ConstruirMensajeDocumento(numeroDestino, nombre, ruta);
             var json = CastToJson(mensaje);
 
-           var respuesta = EnviarMensaje(json).Result;
-
-            if (!respuesta)
-            {
-                return BadRequest("Algo salio mal al enviar el mensaje");
-            }
-
-            return Ok();
+            var respuesta = await EnviarMensaje(json);
+            return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
 
+        /// <summary>
+        /// Cambia el estado de un mensaje a leído.
+        /// </summary>
+        /// <param name="mensajeId">ID del mensaje</param>
         [HttpPut("cambiar-a-leido/{mensajeId}")]
         public async Task<ActionResult> CambiarALeido(int mensajeId)
         {
@@ -115,12 +125,7 @@ namespace ApiWhatsapp.Controller
             {
                 int result = await mensajeRepository.SetLeido(mensajeId);
 
-                if (result == 0)
-                {
-                    return NotFound("Este mensaje no existe");
-                }
-
-                return Ok("Se ha cambiado correctamente");
+                return result == 0 ? NotFound("Este mensaje no existe") : Ok("Se ha cambiado correctamente");
             }
             catch (Exception e)
             {
@@ -128,59 +133,52 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los mensajes registrados.
+        /// </summary>
         [HttpGet("obtener-mensajes")]
         public async Task<ActionResult> GetAllMensajes()
         {
             try
             {
-                List<Mensaje> mensajes = await mensajeRepository.GetMensajes();
-
-                if (mensajes.IsNullOrEmpty())
-                {
-                    return NotFound("No hay mensajes disponibles");
-                }
-
-                return Ok(mensajes);
-            } 
-            catch (Exception e) 
+                var mensajes = await mensajeRepository.GetMensajes();
+                return mensajes.IsNullOrEmpty() ? NotFound("No hay mensajes disponibles") : Ok(mensajes);
+            }
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
         }
 
+        /// <summary>
+        /// Obtiene los mensajes enviados por un número específico.
+        /// </summary>
+        /// <param name="telefonoId">ID del número de origen</param>
         [HttpGet("obtener-mensajes-origen/{telefonoId}")]
         public async Task<ActionResult> GetMensajesByOrigen(long telefonoId)
         {
             try
             {
-                List<Mensaje> mensajes = await mensajeRepository.GetMensajesByOrigen(telefonoId);
-
-                if (mensajes.IsNullOrEmpty())
-                {
-                    return NotFound("No se han encontrado mensajes relacionados con este numero como origen");
-                }
-
-                return Ok(mensajes);
-            } 
+                var mensajes = await mensajeRepository.GetMensajesByOrigen(telefonoId);
+                return mensajes.IsNullOrEmpty() ? NotFound("No se han encontrado mensajes como origen") : Ok(mensajes);
+            }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
         }
 
+        /// <summary>
+        /// Obtiene los mensajes recibidos por un número específico.
+        /// </summary>
+        /// <param name="telefonoId">ID del número de destino</param>
         [HttpGet("obtener-mensajes-destino/{telefonoId}")]
         public async Task<ActionResult> GetMensajesByDestino(long telefonoId)
         {
             try
             {
-                List<Mensaje> mensajes = await mensajeRepository.GetMensajesByDestino(telefonoId);
-
-                if (mensajes.IsNullOrEmpty())
-                {
-                    return NotFound("No se han encontrado mensajes relacionados con este numero como destino");
-                }
-
-                return Ok(mensajes);
+                var mensajes = await mensajeRepository.GetMensajesByDestino(telefonoId);
+                return mensajes.IsNullOrEmpty() ? NotFound("No se han encontrado mensajes como destino") : Ok(mensajes);
             }
             catch (Exception e)
             {
@@ -188,19 +186,17 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Obtiene un mensaje por su ID.
+        /// </summary>
+        /// <param name="mensajeId">ID del mensaje</param>
         [HttpGet("obtener-mensaje/{mensajeId}")]
         public async Task<ActionResult> GetMensajeById(int mensajeId)
         {
             try
             {
-                Mensaje mensaje = await mensajeRepository.GetMensajesById(mensajeId);
-
-                if (mensaje is null)
-                {
-                    return NotFound("Este mensaje no existe");
-                }
-
-                return Ok(mensaje);
+                var mensaje = await mensajeRepository.GetMensajesById(mensajeId);
+                return mensaje is null ? NotFound("Este mensaje no existe") : Ok(mensaje);
             }
             catch (Exception e)
             {
@@ -208,6 +204,10 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Elimina un mensaje por su ID.
+        /// </summary>
+        /// <param name="mensajeId">ID del mensaje</param>
         [HttpDelete("eliminar-mensaje/{mensajeId}")]
         public async Task<ActionResult> RemoveMensaje(int mensajeId)
         {
@@ -215,14 +215,8 @@ namespace ApiWhatsapp.Controller
             {
                 int result = await mensajeRepository.RemoveMensaje(mensajeId);
 
-                if (result == -1)
-                {
-                    return NotFound("Este mensaje no existe");
-                }
-                if (result == 0)
-                {
-                    return BadRequest("No se ha conseguido eliminar");
-                }
+                if (result == -1) return NotFound("Este mensaje no existe");
+                if (result == 0) return BadRequest("No se ha conseguido eliminar");
 
                 return Ok("Eliminado correctamente");
             }
@@ -232,16 +226,27 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Retorna la URL base del endpoint de la API de WhatsApp.
+        /// </summary>
         private static string getUrl(string phonNumberId)
         {
             return "https://graph.facebook.com/v22.0/109348135405910/";
         }
 
+        /// <summary>
+        /// Serializa un objeto a formato JSON.
+        /// </summary>
         private string CastToJson(object mensaje)
         {
             return JsonSerializer.Serialize(mensaje);
         }
 
+        /// <summary>
+        /// Envía un mensaje a la API de WhatsApp.
+        /// </summary>
+        /// <param name="json">Mensaje en formato JSON</param>
+        /// <returns>True si se envió con éxito, False si falló</returns>
         private async Task<bool> EnviarMensaje(string json)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TOKEN);
@@ -254,49 +259,45 @@ namespace ApiWhatsapp.Controller
             {
                 return true;
             }
-            else
-            {
-                Console.WriteLine(responseString);
-                return false;
-            }
+
+            Console.WriteLine(responseString);
+            return false;
         }
 
+        /// <summary>
+        /// Guarda un mensaje en la base de datos.
+        /// </summary>
         private async Task<bool> GuardarMensaje(long numeroOrigen, long numeroDestino, string texto, int idFichero)
         {
             if (telefonoRepository.GetTelefonosById(numeroDestino) is null)
             {
-                throw new Exception($"El telefono {numeroDestino} no esta disponible o no existe");
+                throw new Exception($"El teléfono {numeroDestino} no está disponible o no existe");
             }
 
-            Mensaje mensaje;
-
-            if (texto is "")
-            {
-                mensaje = mensajeRepository.ConstruirMensajeArchivo(34644288224, numeroDestino, idFichero);
-            }
-            else
-            {
-                mensaje = mensajeRepository.ConstruirMensajeTexto(34644288224, numeroDestino, texto);
-            }
+            Mensaje mensaje = string.IsNullOrEmpty(texto)
+                ? mensajeRepository.ConstruirMensajeArchivo(numeroOrigen, numeroDestino, idFichero)
+                : mensajeRepository.ConstruirMensajeTexto(numeroOrigen, numeroDestino, texto);
 
             return await mensajeRepository.AddMensaje(mensaje);
         }
 
+        /// <summary>
+        /// Guarda un fichero en la base de datos (si no existe ya).
+        /// </summary>
         private async Task<int> GuardarFichero(string ruta)
         {
             try
             {
-                Fichero fichero = ficheroRepository.ConstuirFichero(new FicheroDTO { Ruta = ruta });
+                var fichero = ficheroRepository.ConstuirFichero(new FicheroDTO { Ruta = ruta });
 
                 if (!ficheroRepository.ExisteFichero(fichero))
                 {
                     await ficheroRepository.AddFichero(fichero);
-                } else
+                }
+                else
                 {
                     fichero = await ficheroRepository.GetFicheroByRuta(ruta);
                 }
-
-                    Console.WriteLine(fichero.Id);
 
                 return fichero.Id;
             }

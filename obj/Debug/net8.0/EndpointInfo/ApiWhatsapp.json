@@ -390,7 +390,7 @@
         }
       }
     },
-    "/telefono/borrar-Telefono/{telefonoId}": {
+    "/telefono/borrar-telefono/{telefonoId}": {
       "delete": {
         "tags": [
           "Telefonos"

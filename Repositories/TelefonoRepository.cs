@@ -6,11 +6,19 @@ using AutoMapper;
 
 namespace ApiWhatsapp.BBDD
 {
+    /// <summary>
+    /// Repositorio para la gestión de entidades de tipo Teléfono.
+    /// </summary>
     public class TelefonoRepository
     {
         private readonly DbWhatsapp context;
         private readonly IMapper mapper;
 
+        /// <summary>
+        /// Constructor del repositorio de teléfonos.
+        /// </summary>
+        /// <param name="context">Contexto de la base de datos</param>
+        /// <param name="mapper">Instancia de AutoMapper</param>
         public TelefonoRepository(DbWhatsapp context, IMapper mapper)
         {
             this.context = context;
@@ -18,10 +26,10 @@ namespace ApiWhatsapp.BBDD
         }
 
         /// <summary>
-        /// Agrega un telefono a la base de datos
+        /// Agrega un teléfono a la base de datos.
         /// </summary>
-        /// <param name="telefono">Telefono a agregar</param>
-        /// <returns>true si se ha insertado correctamente, false de lo contrario</returns>
+        /// <param name="telefono">Teléfono a agregar</param>
+        /// <returns>True si se ha insertado correctamente, False en caso contrario</returns>
         public async Task<bool> AddTelefono(Telefono telefono)
         {
             try
@@ -44,30 +52,29 @@ namespace ApiWhatsapp.BBDD
         }
 
         /// <summary>
-        /// Obtiene una lista de telefonos
+        /// Obtiene una lista de todos los teléfonos.
         /// </summary>
-        /// <returns>Devuelve una lista de telefonos. Empty si no hay ninguno</returns>
+        /// <returns>Lista de teléfonos. Lista vacía si no hay ninguno</returns>
         public List<Telefono> GetTelefonos()
         {
             List<Telefono> telefonos = [];
             try
             {
                 telefonos = context.Telefonos.ToList();
-
                 return telefonos;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return null;
+                return null!;
             }
         }
 
         /// <summary>
-        /// Obtiene un telefono a traves de su id
+        /// Obtiene un teléfono a partir de su ID.
         /// </summary>
-        /// <param name="Id">El Id del telefono</param>
-        /// <returns>Devuelve el telefono, o null si no se ha encontrado</returns>
+        /// <param name="Id">ID del teléfono</param>
+        /// <returns>Objeto Teléfono si se encuentra, null en caso contrario</returns>
         public Telefono GetTelefonosById(long Id)
         {
             List<Telefono> telefonos = GetTelefonos();
@@ -80,9 +87,12 @@ namespace ApiWhatsapp.BBDD
         }
 
         /// <summary>
-        /// Construye un objeto de Telefono
+        /// Construye un objeto Teléfono a partir de sus atributos.
         /// </summary>
-        /// <returns>Devuelve el objeto de Telefono</returns>
+        /// <param name="numero">Número del teléfono</param>
+        /// <param name="prefijo">Prefijo del país</param>
+        /// <param name="nombre">Nombre asociado al teléfono</param>
+        /// <returns>Objeto Teléfono</returns>
         public Telefono ConstruirTelefono(int numero, short prefijo, string nombre)
         {
             TelefonoDTO telefono = new TelefonoDTO
@@ -95,6 +105,11 @@ namespace ApiWhatsapp.BBDD
             return mapper.Map<Telefono>(telefono);
         }
 
+        /// <summary>
+        /// Elimina un teléfono de la base de datos por su ID.
+        /// </summary>
+        /// <param name="telefonoId">ID del teléfono a eliminar</param>
+        /// <returns>True si fue eliminado, False si no se encontró</returns>
         public async Task<bool> RemoveTelefono(long telefonoId)
         {
             var telefono = context.Telefonos.FirstOrDefault(x => x.Id == telefonoId);

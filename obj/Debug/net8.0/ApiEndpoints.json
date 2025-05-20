@@ -234,7 +234,7 @@
   {
     "ContainingType": "ApiWhatsapp.Controller.TelefonosController",
     "Method": "RemoveTelefono",
-    "RelativePath": "telefono/borrar-Telefono/{telefonoId}",
+    "RelativePath": "telefono/borrar-telefono/{telefonoId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,

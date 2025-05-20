@@ -155,11 +155,21 @@ namespace ApiWhatsapp.BBDD
             return fichero1!;
         }
 
+        /// <summary>
+        /// Obtener la extension del fichero
+        /// </summary>
+        /// <param name="ruta">ruta absoluta del archivo sin extension</param>
+        /// <returns>devuelve la extension del archivo</returns>
         public string GetExtension(string ruta)
         {
             return Path.GetExtension(ruta);
         }
 
+        /// <summary>
+        /// Obtiene el MIME ype del archivo
+        /// </summary>
+        /// <param name="ruta">ruta absoluta del archivo</param>
+        /// <returns>Un string con el valor del MIME type</returns>
         public string GetMIME(string ruta)
         {
             var provider = new FileExtensionContentTypeProvider();

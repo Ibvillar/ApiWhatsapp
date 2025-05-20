@@ -1,6 +1,5 @@
 using System.Text;
 using ApiWhatsapp.Data;
-using ApiWhatsapp.Helpers;
 using ApiWhatsapp.Swagger;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -15,6 +14,8 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddDbContext<DbWhatsapp>(opciones =>
                     opciones.UseSqlServer("name=WhatsappConection"), ServiceLifetime.Scoped);
 
+//Token
+//Ahora mismo no es funcional
 builder.Services.AddAuthentication().AddJwtBearer(opciones =>
 {
     opciones.MapInboundClaims = false;
@@ -46,6 +47,7 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<AuthorizationFilter>();
 });
 
+//CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
