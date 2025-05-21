@@ -20,9 +20,9 @@ namespace ApiWhatsapp.Controller
         /// <summary>
         /// Constructor del controlador de teléfonos.
         /// </summary>
-        public TelefonosController(DbWhatsapp context, IMapper mapper)
+        public TelefonosController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper)
         {
-            telefonoRepository = new TelefonoRepository(context, mapper);
+            telefonoRepository = new TelefonoRepository(context, contextTerceros, mapper);
         }
 
         /// <summary>
@@ -105,6 +105,34 @@ namespace ApiWhatsapp.Controller
             catch (Exception e)
             {
                 return BadRequest(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Permite actualizar el nombre asociado a un número de teléfono.
+        /// </summary>
+        /// <param name="telefono">Objeto que contiene el número de teléfono y el nuevo nombre a asignar.</param>
+        /// <returns>
+        /// Retorna un resultado HTTP 200 (OK) con el objeto enviado si la operación fue exitosa,
+        /// o un HTTP 400 (Bad Request) si falló o se produjo una excepción.
+        /// </returns>
+        [HttpPut("set-name")]
+        public async Task<ActionResult> SetName(TelefonoNombre telefono) 
+        {
+            try
+            {
+                bool result = await telefonoRepository.SetNombre(telefono.telfono, telefono.nombre);
+
+                if (result)
+                {
+                    return Ok(telefono);
+                }
+
+                return BadRequest("El nombre no se ha podido cambiar");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
             }
         }
 

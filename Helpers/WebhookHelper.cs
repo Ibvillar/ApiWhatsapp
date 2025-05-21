@@ -27,10 +27,10 @@ namespace ApiWhatsapp.Helpers
         /// </summary>
         /// <param name="context">Contexto de base de datos</param>
         /// <param name="mapper">Instancia de AutoMapper</param>
-        public WebhookHelper(DbWhatsapp context, IMapper mapper, IConfiguration configuration)
+        public WebhookHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration configuration)
         {
             this.context = context;
-            telefonoRepository = new TelefonoRepository(context, mapper);
+            telefonoRepository = new TelefonoRepository(context, contextTerceros, mapper);
             mensajeRepository = new MensajeRepository(context);
             ficheroRepository = new FicheroRepository(context, mapper);
             _httpClient = new HttpClient();

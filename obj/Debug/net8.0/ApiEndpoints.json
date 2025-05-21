@@ -274,6 +274,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "ApiWhatsapp.Controller.TelefonosController",
+    "Method": "SetName",
+    "RelativePath": "telefono/set-name",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "telefono",
+        "Type": "ApiWhatsapp.DTO.TelefonoNombre",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ApiWhatsapp.Controller.WhatsappWebhookController",
     "Method": "Verify",
     "RelativePath": "webhook",

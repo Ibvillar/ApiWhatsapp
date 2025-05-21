@@ -54,7 +54,7 @@ namespace ApiWhatsapp.BBDD
         {
             try
             {
-                return await context.Mensajes.ToListAsync();
+                return await context.Mensajes.OrderBy(x => x.Fecha).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -76,7 +76,7 @@ namespace ApiWhatsapp.BBDD
                 return null!;
             }
 
-            return mensajes.FirstOrDefault(x => x.Id == Id)!;
+            return mensajes.OrderBy(x => x.Fecha).FirstOrDefault(x => x.Id == Id)!;
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace ApiWhatsapp.BBDD
                 return null!;
             }
 
-            return mensajes.Where(x => x.IdOrigen == IdOrigen).ToList();
+            return mensajes.Where(x => x.IdOrigen == IdOrigen).OrderBy(x => x.Fecha).ToList();
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace ApiWhatsapp.BBDD
                 return null!;
             }
 
-            return mensajes.Where(x => x.IdDestino == IdDestino).ToList();
+            return mensajes.Where(x => x.IdDestino == IdDestino).OrderBy(x => x.Fecha).ToList();
         }
 
         /// <summary>

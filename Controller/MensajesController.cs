@@ -29,13 +29,13 @@ namespace ApiWhatsapp.Controller
         /// <summary>
         /// Constructor del controlador de mensajes.
         /// </summary>
-        public MensajesController(DbWhatsapp context, IMapper mapper)
+        public MensajesController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper)
         {
             _httpClient = new HttpClient();
             _mensajesHelper = new MensajeHelper(TOKEN, getUrl(""));
             ficheroRepository = new FicheroRepository(context, mapper);
             mensajeRepository = new MensajeRepository(context);
-            telefonoRepository = new TelefonoRepository(context, mapper);
+            telefonoRepository = new TelefonoRepository(context, contextTerceros, mapper);
         }
 
         /// <summary>

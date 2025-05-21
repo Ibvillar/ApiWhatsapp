@@ -1,5 +1,4 @@
-﻿using ApiWhatsapp.DTO;
-using ApiWhatsapp.Entities;
+﻿using ApiWhatsapp.Entities;
 using ApiWhatsapp.Entitties;
 using Microsoft.EntityFrameworkCore;
 

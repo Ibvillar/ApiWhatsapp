@@ -19,5 +19,8 @@ namespace ApiWhatsapp.Entitties
         [Required]
         [Column("NOMBRE")]
         public required string Nombre { get; set; }
+
+        [Column("ID_TERCEROS")]
+        public int IdTerceros { get; set; }
     }
 }

@@ -390,6 +390,42 @@
         }
       }
     },
+    "/telefono/set-name": {
+      "put": {
+        "tags": [
+          "Telefonos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelefonoNombre"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelefonoNombre"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelefonoNombre"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelefonoNombre"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/telefono/borrar-telefono/{telefonoId}": {
       "delete": {
         "tags": [
@@ -474,6 +510,37 @@
         },
         "additionalProperties": false
       },
+      "Telefono": {
+        "required": [
+          "nombre",
+          "numero",
+          "prefijo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "numero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "prefijo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "idTerceros": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "TelefonoDTO": {
         "required": [
           "nombre",
@@ -493,6 +560,19 @@
           "nombre": {
             "minLength": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TelefonoNombre": {
+        "type": "object",
+        "properties": {
+          "telfono": {
+            "$ref": "#/components/schemas/Telefono"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
