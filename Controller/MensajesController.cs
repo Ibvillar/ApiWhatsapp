@@ -114,6 +114,22 @@ namespace ApiWhatsapp.Controller
             return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
 
+        [HttpPost("enviar-boton")]
+        public async Task<ActionResult> EnviarMensajeBoton()
+        {
+            var mensaje = mensajeRepository.ConstruirMensajeConBotonReply(
+                "34673042406", 
+                "Pulsa en el boton",
+                "saludar",
+                "Di hola"
+            );
+
+            var json = CastToJson(mensaje);
+
+            var respuesta = await EnviarMensaje(json);
+            return respuesta? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
+        }
+
         /// <summary>
         /// Cambia el estado de un mensaje a leído.
         /// </summary>

@@ -4,6 +4,7 @@ using ApiWhatsapp.Data;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
 using ApiWhatsapp.DTO;
+using ApiWhatsapp.Entities;
 
 namespace ApiWhatsapp.Helpers
 {
@@ -19,8 +20,11 @@ namespace ApiWhatsapp.Helpers
         private readonly HttpClient _httpClient;
         private readonly string TOKEN = "EAAHbxd02hJUBOZBOv4ZBzlQOtnojQLixKdobeqIz654prmYhyHXZBJCLXMBfyuBHt8ckCaBWILHENAmfRMDUhEoY3kHZBuaxsBmJMBAiarzNZADbLj6bVsrf288U3qdYtCXgiE5AZCfN0oFuXESDsOBmDYcB2aKE3zqnnsDYumU5T3XZAmVb8a1ZBqfUnNEmxgDp0liEh6zeo01Kei90";
         private readonly DbWhatsapp context;
+        private readonly DbTerceros contextTerceros;
         private readonly IConfiguration _configuration;
         private readonly string ruta;
+        private readonly BotonesHelper botonesHelper;
+        private readonly IMapper mapper;
 
         /// <summary>
         /// Constructor de la clase WebhookHelper.
@@ -30,12 +34,15 @@ namespace ApiWhatsapp.Helpers
         public WebhookHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration configuration)
         {
             this.context = context;
+            this.contextTerceros = contextTerceros;
+            this.mapper = mapper;
             telefonoRepository = new TelefonoRepository(context, contextTerceros, mapper);
             mensajeRepository = new MensajeRepository(context);
             ficheroRepository = new FicheroRepository(context, mapper);
             _httpClient = new HttpClient();
             _configuration = configuration;
             ruta = _configuration["RutaFicheros"]!;
+            botonesHelper = new BotonesHelper(context, contextTerceros, mapper);
         }
 
         /// <summary>
@@ -43,16 +50,16 @@ namespace ApiWhatsapp.Helpers
         /// </summary>
         /// <param name="mensaje">Mensaje recibido desde el webhook</param>
         /// <param name="nombre">Nombre asociado al número si es nuevo</param>
-        public async Task GuardarMensaje(MessageWeebhook mensaje, string nombre)
+        public async Task GuardarMensaje(MessageWebhook mensaje, string numero)
         {
-            await ObtenerTelefono(mensaje, nombre);
+            await ObtenerTelefono(mensaje, numero);
             await GetMensajePorTipo(mensaje);
         }
 
         /// <summary>
         /// Identifica el tipo de mensaje y ejecuta la lógica correspondiente.
         /// </summary>
-        private async Task GetMensajePorTipo(MessageWeebhook mensaje)
+        private async Task GetMensajePorTipo(MessageWebhook mensaje)
         {
             switch (mensaje.type)
             {
@@ -61,8 +68,16 @@ namespace ApiWhatsapp.Helpers
                     break;
 
                 case "image":
+                    await GuardarMensajeArchivo(mensaje);
+                    break;
+
                 case "document":
                     await GuardarMensajeArchivo(mensaje);
+                    break;
+
+                case "interactive":
+                    await GuardarMensajeBoton(mensaje);
+                    botonesHelper.ResponderMensaje();
                     break;
 
                 default:
@@ -74,7 +89,7 @@ namespace ApiWhatsapp.Helpers
         /// <summary>
         /// Guarda un mensaje de archivo (imagen o documento) en el sistema.
         /// </summary>
-        private async Task GuardarMensajeArchivo(MessageWeebhook mensaje)
+        private async Task GuardarMensajeArchivo(MessageWebhook mensaje)
         {
             string ruta = mensaje.image is null
                 ? await DescargarArchivoDesdeMetaAsync(mensaje.document.id, mensaje.document.filename)
@@ -97,10 +112,15 @@ namespace ApiWhatsapp.Helpers
             }
         }
 
+        private async Task GuardarMensajeBoton(MessageWebhook mensaje)
+        {
+
+        }
+
         /// <summary>
         /// Guarda un mensaje de texto en la base de datos.
         /// </summary>
-        private async Task GuardarMensajeTexto(MessageWeebhook mensaje)
+        private async Task GuardarMensajeTexto(MessageWebhook mensaje)
         {
             var mensajeTexto = mensajeRepository.ConstruirMensajeTexto(
                 long.Parse(mensaje.from), 34644288224, mensaje.text.body);
@@ -114,7 +134,7 @@ namespace ApiWhatsapp.Helpers
         /// <param name="webhook">Mensaje recibido</param>
         /// <param name="nombre">Nombre a asociar si es nuevo</param>
         /// <returns>Objeto Telefono</returns>
-        private async Task<Telefono> ObtenerTelefono(MessageWeebhook webhook, string nombre)
+        private async Task<Telefono> ObtenerTelefono(MessageWebhook webhook, string numero1)
         {
             var telefono = telefonoRepository.GetTelefonosById(long.Parse(webhook.from));
 
@@ -128,7 +148,7 @@ namespace ApiWhatsapp.Helpers
                 }
 
                 telefono = telefonoRepository.ConstruirTelefono(
-                    numero.Value.numeroSinPrefijo, numero.Value.prefijo, nombre);
+                    numero.Value.numeroSinPrefijo, numero.Value.prefijo, numero1);
 
                 await telefonoRepository.AddTelefono(telefono);
             }

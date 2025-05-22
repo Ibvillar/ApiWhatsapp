@@ -1,4 +1,4 @@
-﻿namespace ApiWhatsapp.Entitties
+﻿namespace ApiWhatsapp.Entities
 {
     public class WebhookPayload
     {
@@ -21,7 +21,7 @@
     public class Value
     {
         public Metadata metadata { get; set; }
-        public List<MessageWeebhook> messages { get; set; }
+        public List<MessageWebhook> messages { get; set; }
         public List<Contact> contacts { get; set; }
     }
 
@@ -42,7 +42,7 @@
         public string phone_number_id { get; set; }
     }
 
-    public class MessageWeebhook
+    public class MessageWebhook
     {
         public string from { get; set; }
         public string id { get; set; }
@@ -50,6 +50,7 @@
         public MessageText text { get; set; }
         public MessageImage image { get; set; }
         public MessageDocument document { get; set; }
+        public Interactive interactive { get; set; }
     }
 
     public class MessageText
@@ -69,5 +70,17 @@
         public string id { get; set; }
         public string filename { get; set; }
         public string mime_type { get; set; }
+    }
+
+    public class Interactive
+    {
+        public string type { get; set; }
+        public ButtonReply button_reply { get; set; }
+    }
+
+    public class ButtonReply
+    {
+        public string id { get; set; }
+        public string title { get; set; }
     }
 }

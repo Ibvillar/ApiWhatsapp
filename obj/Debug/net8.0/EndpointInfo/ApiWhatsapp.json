@@ -192,6 +192,18 @@
         }
       }
     },
+    "/mensajes/enviar-boton": {
+      "post": {
+        "tags": [
+          "Mensajes"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/mensajes/cambiar-a-leido/{mensajeId}": {
       "put": {
         "tags": [

@@ -1,5 +1,5 @@
 ﻿using ApiWhatsapp.Data;
-using ApiWhatsapp.Entitties;
+using ApiWhatsapp.Entities;
 using ApiWhatsapp.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -59,7 +59,7 @@ namespace ApiWhatsapp.Controller
                     // Logica para guardar el mensaje
                     foreach (var message in messages)
                     {
-                        await webhookHelper.GuardarMensaje(message, contact!.profile.name);
+                        await webhookHelper.GuardarMensaje(message, contact!.wa_id);
                     }
                 }
             }

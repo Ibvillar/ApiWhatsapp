@@ -91,6 +91,16 @@
   },
   {
     "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "EnviarMensajeBoton",
+    "RelativePath": "mensajes/enviar-boton",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
     "Method": "EnviarMensajeDocumento",
     "RelativePath": "mensajes/enviar-documento",
     "HttpMethod": "POST",

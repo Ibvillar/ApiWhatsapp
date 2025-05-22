@@ -1,6 +1,9 @@
 ﻿using ApiWhatsapp.Data;
+using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using static System.Net.WebRequestMethods;
 
 namespace ApiWhatsapp.BBDD
 {
@@ -193,6 +196,47 @@ namespace ApiWhatsapp.BBDD
             mensaje.IdFichero = IdFichero;
 
             return mensaje;
+        }
+
+        /// <summary>
+        /// Construye un mensaje interactivo con un botón de tipo "reply" para ser enviado a través de la API de WhatsApp.
+        /// </summary>
+        /// <param name="numero">Número de teléfono del destinatario en formato internacional.</param>
+        /// <param name="mensaje">Texto del cuerpo del mensaje que se mostrará al usuario.</param>
+        /// <param name="idBoton">Identificador único del botón de respuesta (usado para identificar qué botón fue pulsado).</param>
+        /// <param name="tituloBoton">Texto visible que se mostrará en el botón.</param>
+        /// <returns>Objeto <see cref="MensajeBotonReply"/> listo para ser serializado y enviado a la API de WhatsApp.</returns>
+        public MensajeBotonReply ConstruirMensajeConBotonReply(string numero, string mensaje, string idBoton, string tituloBoton)
+        {
+            return new MensajeBotonReply
+            {
+                MessagingProduct = "whatsapp",
+                TelefonoDestino = numero,
+                Tipo = "interactive",
+                interactive = new InteractiveReply
+                {
+                    type = "button",
+                    body = new BodyReply
+                    {
+                        text = mensaje
+                    },
+                    action = new ActionReply
+                    {
+                        buttons = new ButtonReply[]
+                        {
+                        new ButtonReply
+                        {
+                            type = "reply",
+                            reply = new Reply
+                            {
+                                id = idBoton,
+                                title = tituloBoton
+                            }
+                        }
+                    }
+                    }
+                }
+            };
         }
 
         /// <summary>
