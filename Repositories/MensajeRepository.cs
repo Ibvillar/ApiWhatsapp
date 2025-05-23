@@ -198,6 +198,14 @@ namespace ApiWhatsapp.BBDD
             return mensaje;
         }
 
+        public Mensaje ConstruirMensajeBotonGuardado(long numeroOrigen, long numeroDestino, int idBoton)
+        {
+            var mensaje = ConstruirMensaje(numeroOrigen, numeroDestino);
+            mensaje.Boton = idBoton;
+
+            return mensaje;
+        }
+
         /// <summary>
         /// Construye un mensaje interactivo con un botón de tipo "reply" para ser enviado a través de la API de WhatsApp.
         /// </summary>
@@ -206,7 +214,7 @@ namespace ApiWhatsapp.BBDD
         /// <param name="idBoton">Identificador único del botón de respuesta (usado para identificar qué botón fue pulsado).</param>
         /// <param name="tituloBoton">Texto visible que se mostrará en el botón.</param>
         /// <returns>Objeto <see cref="MensajeBotonReply"/> listo para ser serializado y enviado a la API de WhatsApp.</returns>
-        public MensajeBotonReply ConstruirMensajeConBotonReply(string numero, string mensaje, string idBoton, string tituloBoton)
+        public MensajeBotonReply ContruirMensajeBoton(string numero, string mensaje, string idBoton, string tituloBoton)
         {
             return new MensajeBotonReply
             {
@@ -254,7 +262,8 @@ namespace ApiWhatsapp.BBDD
                 Fecha = DateTime.Now,
                 Leido = false,
                 Texto = "",
-                IdFichero = -1
+                IdFichero = -1,
+                Boton = -1
             };
         }
     }

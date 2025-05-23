@@ -18,7 +18,8 @@ namespace ApiWhatsapp.Entitties
         public required long IdDestino { get; set; }
 
         [Column("TEXTO")]
-        public string Texto { get; set; }
+        [Required]
+        public required string Texto { get; set; }
 
         [Required]
         [Column("FECHA")]
@@ -29,5 +30,9 @@ namespace ApiWhatsapp.Entitties
 
         [Column("LEIDO")]
         public bool Leido { get; set; }
+
+        [Column("ID_BOTON")]
+        [Required]
+        public required int Boton { get; set; }
     }
 }

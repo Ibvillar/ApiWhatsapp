@@ -1,4 +1,5 @@
-﻿using ApiWhatsapp.Data;
+﻿using System.Threading.Tasks;
+using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
@@ -131,13 +132,21 @@ namespace ApiWhatsapp.BBDD
         /// Comprobar si existe el fichero indicado
         /// </summary>
         /// <returns>true en caso de que exista, false en caso contrario</returns>
-        public bool ExisteFichero(Fichero fichero)
+        public async Task<bool> ExisteFichero(Fichero fichero)
         {
             if (fichero is null)
             {
                 return false;
             }
 
+            Fichero? fichero1  = await context.Ficheros.FirstOrDefaultAsync(x => x.Ruta == fichero.Ruta);
+
+            if (fichero1 is null)
+            {
+                Console.WriteLine("11111111111111111111111111");
+                return false;
+            }
+            
             return true;
         }
 

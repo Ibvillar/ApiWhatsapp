@@ -127,7 +127,7 @@
         }
       }
     },
-    "/mensajes/enviar-imagen": {
+    "/mensajes/enviar-imagen/{numeroDestino}": {
       "post": {
         "tags": [
           "Mensajes"
@@ -135,7 +135,8 @@
         "parameters": [
           {
             "name": "numeroDestino",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "integer",
               "format": "int64"
@@ -197,6 +198,55 @@
         "tags": [
           "Mensajes"
         ],
+        "parameters": [
+          {
+            "name": "cuerpo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"

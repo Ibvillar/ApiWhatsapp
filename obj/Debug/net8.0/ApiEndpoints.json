@@ -96,7 +96,18 @@
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "cuerpo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "idBoton",
+        "Type": "System.Int32[]",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -128,7 +139,7 @@
   {
     "ContainingType": "ApiWhatsapp.Controller.MensajesController",
     "Method": "EnviarMensajeImagen",
-    "RelativePath": "mensajes/enviar-imagen",
+    "RelativePath": "mensajes/enviar-imagen/{numeroDestino}",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -136,7 +147,7 @@
       {
         "Name": "numeroDestino",
         "Type": "System.Int64",
-        "IsRequired": false
+        "IsRequired": true
       },
       {
         "Name": "ruta",

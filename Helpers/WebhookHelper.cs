@@ -77,7 +77,7 @@ namespace ApiWhatsapp.Helpers
 
                 case "interactive":
                     await GuardarMensajeBoton(mensaje);
-                    botonesHelper.ResponderMensaje();
+                    await botonesHelper.ResponderMensaje(mensaje);
                     break;
 
                 default:
@@ -114,7 +114,17 @@ namespace ApiWhatsapp.Helpers
 
         private async Task GuardarMensajeBoton(MessageWebhook mensaje)
         {
+            try
+            {
+                var mensajeArchivo = mensajeRepository.ConstruirMensajeBotonGuardado(
+                    long.Parse(mensaje.from), 34644288224, int.Parse(mensaje.interactive.button_reply.id));
 
+                await mensajeRepository.AddMensaje(mensajeArchivo);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         /// <summary>

@@ -44,7 +44,7 @@ namespace ApiWhatsapp.Controller
             Fichero fichero = ficheroRepository.ConstuirFichero(ficheroDTO);
 
             // Verifica si ya existe
-            if (ficheroRepository.ExisteFichero(fichero))
+            if (await ficheroRepository.ExisteFichero(fichero))
             {
                 return BadRequest("Este fichero ya existe. Utilizar remplazar");
             }

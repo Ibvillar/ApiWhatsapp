@@ -9,6 +9,8 @@ using ApiWhatsapp.Entitties;
 using AutoMapper;
 using ApiWhatsapp.DTO;
 using Microsoft.IdentityModel.Tokens;
+using ApiWhatsapp.Repositories;
+using ApiWhatsapp.Entities;
 
 namespace ApiWhatsapp.Controller
 {
@@ -25,6 +27,7 @@ namespace ApiWhatsapp.Controller
         private FicheroRepository ficheroRepository;
         private MensajeRepository mensajeRepository;
         private TelefonoRepository telefonoRepository;
+        private BotonRepository botonRepository;
 
         /// <summary>
         /// Constructor del controlador de mensajes.
@@ -36,6 +39,7 @@ namespace ApiWhatsapp.Controller
             ficheroRepository = new FicheroRepository(context, mapper);
             mensajeRepository = new MensajeRepository(context);
             telefonoRepository = new TelefonoRepository(context, contextTerceros, mapper);
+            botonRepository = new BotonRepository(context);
         }
 
         /// <summary>
@@ -68,16 +72,18 @@ namespace ApiWhatsapp.Controller
         /// </summary>
         /// <param name="numeroDestino">Número del destinatario</param>
         /// <param name="ruta">Ruta del fichero de imagen</param>
-        [HttpPost("enviar-imagen")]
+        [HttpPost("enviar-imagen/{numeroDestino}")]
         public async Task<ActionResult> EnviarMensajeImagen(long numeroDestino, string ruta)
         {
             try
             {
                 int idFichero = await GuardarFichero(ruta);
+                Console.WriteLine(numeroDestino);
                 await GuardarMensaje(34644288224, numeroDestino, "", idFichero);
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.ToString());
                 return BadRequest(e.Message);
             }
 
@@ -115,19 +121,21 @@ namespace ApiWhatsapp.Controller
         }
 
         [HttpPost("enviar-boton")]
-        public async Task<ActionResult> EnviarMensajeBoton()
+        public async Task<ActionResult> EnviarMensajeBoton(string cuerpo, params int[] idBoton)
         {
-            var mensaje = mensajeRepository.ConstruirMensajeConBotonReply(
-                "34673042406", 
-                "Pulsa en el boton",
-                "saludar",
-                "Di hola"
+            Boton boton = await botonRepository.GetBotonById(idBoton[0]);
+
+            var mensaje = mensajeRepository.ContruirMensajeBoton(
+                "34673042406",
+                cuerpo,
+                idBoton[0].ToString(),
+                boton.Texto
             );
 
             var json = CastToJson(mensaje);
 
             var respuesta = await EnviarMensaje(json);
-            return respuesta? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
+            return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
 
         /// <summary>
@@ -306,19 +314,20 @@ namespace ApiWhatsapp.Controller
             {
                 var fichero = ficheroRepository.ConstuirFichero(new FicheroDTO { Ruta = ruta });
 
-                if (!ficheroRepository.ExisteFichero(fichero))
+                if (await ficheroRepository.ExisteFichero(fichero))
                 {
-                    await ficheroRepository.AddFichero(fichero);
+                    fichero = await ficheroRepository.GetFicheroByRuta(ruta);
                 }
                 else
                 {
-                    fichero = await ficheroRepository.GetFicheroByRuta(ruta);
+                    await ficheroRepository.AddFichero(fichero);
                 }
 
                 return fichero.Id;
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.ToString());
                 throw new Exception(e.Message);
             }
         }
