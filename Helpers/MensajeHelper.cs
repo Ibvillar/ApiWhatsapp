@@ -13,17 +13,19 @@ namespace ApiWhatsapp.EnvioMensajes
         private HttpClient _httpClient;
         private readonly string _token;
         private readonly string url;
+        private readonly string ruta;
 
         /// <summary>
         /// Constructor de la clase MensajeHelper.
         /// </summary>
         /// <param name="_token">Token de autenticación de la API de WhatsApp</param>
         /// <param name="url">URL base del servicio de WhatsApp</param>
-        public MensajeHelper(string _token, string url)
+        public MensajeHelper(string _token, string url, IConfiguration _configuracion)
         {
             _httpClient = new HttpClient();
             this._token = _token;
             this.url = url;
+            ruta = _configuracion["RutaFicheros"]!;
         }
 
         /// <summary>
@@ -93,6 +95,29 @@ namespace ApiWhatsapp.EnvioMensajes
                 }
             };
         }
+
+        public async Task<string> UploadFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return null;
+
+            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), ruta);
+
+            if (!Directory.Exists(uploadsPath))
+                Directory.CreateDirectory(uploadsPath);
+
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return filePath;
+        }
+
+
 
         /// <summary>
         /// Sube un archivo al servidor de WhatsApp y obtiene el ID del media.

@@ -103,6 +103,11 @@
         "IsRequired": false
       },
       {
+        "Name": "numero",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
         "Name": "idBoton",
         "Type": "System.Int32[]",
         "IsRequired": true
@@ -139,6 +144,22 @@
   {
     "ContainingType": "ApiWhatsapp.Controller.MensajesController",
     "Method": "EnviarMensajeImagen",
+    "RelativePath": "mensajes/enviar-imagen",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "EnviarMensajeImagen",
     "RelativePath": "mensajes/enviar-imagen/{numeroDestino}",
     "HttpMethod": "POST",
     "IsController": true,
@@ -150,8 +171,8 @@
         "IsRequired": true
       },
       {
-        "Name": "ruta",
-        "Type": "System.String",
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
         "IsRequired": false
       }
     ],

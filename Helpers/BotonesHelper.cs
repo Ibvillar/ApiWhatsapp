@@ -10,9 +10,9 @@ namespace ApiWhatsapp.Helpers
         private readonly MensajesController _mensajeController;
         private readonly ControlPresenciaController _controller;
 
-        public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper) 
+        public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion) 
         {
-            _mensajeController = new MensajesController(context, contextTerceros, mapper);
+            _mensajeController = new MensajesController(context, contextTerceros, mapper, _configuracion);
             _controller = new ControlPresenciaController();
         }
 
@@ -46,7 +46,7 @@ namespace ApiWhatsapp.Helpers
             // Determina los siguientes botones a mostrar según resultado
             var botonesSiguientes = ObtenerBotonesSiguientes(idAccion, error);
 
-            await _mensajeController.EnviarMensajeBoton(texto, botonesSiguientes, numero);
+            await _mensajeController.EnviarMensajeBoton(texto, numero, botonesSiguientes);
         }
 
         private string ConstruirCuerpo(int id, string error)

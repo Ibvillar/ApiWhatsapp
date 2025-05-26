@@ -20,7 +20,6 @@ namespace ApiWhatsapp.Helpers
         private readonly HttpClient _httpClient;
         private readonly string TOKEN = "EAAHbxd02hJUBOZBOv4ZBzlQOtnojQLixKdobeqIz654prmYhyHXZBJCLXMBfyuBHt8ckCaBWILHENAmfRMDUhEoY3kHZBuaxsBmJMBAiarzNZADbLj6bVsrf288U3qdYtCXgiE5AZCfN0oFuXESDsOBmDYcB2aKE3zqnnsDYumU5T3XZAmVb8a1ZBqfUnNEmxgDp0liEh6zeo01Kei90";
         private readonly DbWhatsapp context;
-        private readonly DbTerceros contextTerceros;
         private readonly IConfiguration _configuration;
         private readonly string ruta;
         private readonly BotonesHelper botonesHelper;
@@ -34,7 +33,6 @@ namespace ApiWhatsapp.Helpers
         public WebhookHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration configuration)
         {
             this.context = context;
-            this.contextTerceros = contextTerceros;
             this.mapper = mapper;
             telefonoRepository = new TelefonoRepository(context, contextTerceros, mapper);
             mensajeRepository = new MensajeRepository(context);
@@ -42,7 +40,7 @@ namespace ApiWhatsapp.Helpers
             _httpClient = new HttpClient();
             _configuration = configuration;
             ruta = _configuration["RutaFicheros"]!;
-            botonesHelper = new BotonesHelper(context, contextTerceros, mapper);
+            botonesHelper = new BotonesHelper(context, contextTerceros, mapper, configuration);
         }
 
         /// <summary>
@@ -91,13 +89,20 @@ namespace ApiWhatsapp.Helpers
         /// </summary>
         private async Task GuardarMensajeArchivo(MessageWebhook mensaje)
         {
-            string ruta = mensaje.image is null
-                ? await DescargarArchivoDesdeMetaAsync(mensaje.document.id, mensaje.document.filename)
-                : await DescargarArchivoDesdeMetaAsync(mensaje.image.id, mensaje.document.filename);
+            string rutaArchivo = "";
+
+            if (mensaje.image is not null)
+            {
+                rutaArchivo = await DescargarArchivoDesdeMetaAsync(mensaje.image.id, mensaje.image.id);
+            }
+            else if (mensaje.document is not null)
+            {
+                rutaArchivo = await DescargarArchivoDesdeMetaAsync(mensaje.document.id, mensaje.document.filename);
+            }
 
             try
             {
-                var ficheroDTO = new FicheroDTO { Ruta = ruta };
+                var ficheroDTO = new FicheroDTO { Ruta = rutaArchivo };
                 var fichero = ficheroRepository.ConstuirFichero(ficheroDTO);
                 await ficheroRepository.AddFichero(fichero);
 
@@ -250,12 +255,11 @@ namespace ApiWhatsapp.Helpers
                     _ => ".bin"
                 };
 
-                string fullPath = Path.Combine(ruta, nombreArchivo);
-                Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+                Console.WriteLine(nombreArchivo);
+                string fullPath = nombreArchivo + extension;
+                Directory.CreateDirectory(Path.GetDirectoryName(ruta + fullPath)!);
 
-                await File.WriteAllBytesAsync(fullPath, fileBytes);
-
-                Console.WriteLine($"Archivo guardado exitosamente en: {fullPath}");
+                await File.WriteAllBytesAsync(ruta + fullPath, fileBytes);
 
                 return fullPath;
             }

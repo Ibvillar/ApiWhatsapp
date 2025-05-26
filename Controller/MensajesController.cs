@@ -28,18 +28,20 @@ namespace ApiWhatsapp.Controller
         private MensajeRepository mensajeRepository;
         private TelefonoRepository telefonoRepository;
         private BotonRepository botonRepository;
+        private readonly long NumeroEmpresa;
 
         /// <summary>
         /// Constructor del controlador de mensajes.
         /// </summary>
-        public MensajesController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper)
+        public MensajesController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion)
         {
             _httpClient = new HttpClient();
-            _mensajesHelper = new MensajeHelper(TOKEN, getUrl(""));
+            _mensajesHelper = new MensajeHelper(TOKEN, getUrl(""), _configuracion);
             ficheroRepository = new FicheroRepository(context, mapper);
             mensajeRepository = new MensajeRepository(context);
             telefonoRepository = new TelefonoRepository(context, contextTerceros, mapper);
             botonRepository = new BotonRepository(context);
+            NumeroEmpresa = long.Parse(_configuracion["NumeroEmpresa"]!);
         }
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                await GuardarMensaje(34644288224, numeroDestino, texto, -1);
+                await GuardarMensaje(NumeroEmpresa, numeroDestino, texto, -1);
             }
             catch (Exception e)
             {
@@ -73,26 +75,34 @@ namespace ApiWhatsapp.Controller
         /// <param name="numeroDestino">Número del destinatario</param>
         /// <param name="ruta">Ruta del fichero de imagen</param>
         [HttpPost("enviar-imagen/{numeroDestino}")]
-        public async Task<ActionResult> EnviarMensajeImagen(long numeroDestino, string ruta)
+        [HttpPost("enviar-imagen")]
+        public async Task<ActionResult> EnviarMensajeImagen(long numeroDestino, IFormFile file)
         {
             try
             {
-                int idFichero = await GuardarFichero(ruta);
-                Console.WriteLine(numeroDestino);
-                await GuardarMensaje(34644288224, numeroDestino, "", idFichero);
+                // Subir archivo y obtener la ruta donde se guardó
+                string rutaArchivo = await _mensajesHelper.UploadFile(file);
+                if (string.IsNullOrEmpty(rutaArchivo))
+                    return BadRequest("No se pudo guardar el archivo");
+
+                // Guardar referencia del archivo y el mensaje
+                int idFichero = await GuardarFichero(rutaArchivo.Substring(rutaArchivo.LastIndexOfAny("/".ToCharArray()), rutaArchivo.Last()));
+                await GuardarMensaje(NumeroEmpresa, numeroDestino, "", idFichero);
+
+                // Construir y enviar el mensaje con imagen
+                var mensaje = await _mensajesHelper.ConstruirMensajeImagen(numeroDestino, rutaArchivo);
+                var json = CastToJson(mensaje);
+
+                var respuesta = await EnviarMensaje(json);
+                return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
                 return BadRequest(e.Message);
             }
-
-            var mensaje = await _mensajesHelper.ConstruirMensajeImagen(numeroDestino, ruta);
-            var json = CastToJson(mensaje);
-
-            var respuesta = await EnviarMensaje(json);
-            return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
+
 
         /// <summary>
         /// Envía un documento a un número específico.
@@ -106,7 +116,7 @@ namespace ApiWhatsapp.Controller
             try
             {
                 int idFichero = await GuardarFichero(ruta);
-                await GuardarMensaje(34644288224, numeroDestino, "", idFichero);
+                await GuardarMensaje(NumeroEmpresa, numeroDestino, "", idFichero);
             }
             catch (Exception e)
             {
@@ -120,8 +130,15 @@ namespace ApiWhatsapp.Controller
             return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
 
+        /// <summary>
+        /// Envía un mensaje con botones a un número de teléfono.
+        /// </summary>
+        /// <param name="cuerpo">Texto del mensaje.</param>
+        /// <param name="numero">Número de destino.</param>
+        /// <param name="idBoton">IDs de los botones a incluir (máx. 3).</param>
+        /// <returns>OK si se envió correctamente, BadRequest si hubo error.</returns>
         [HttpPost("enviar-boton")]
-        public async Task<ActionResult> EnviarMensajeBoton(string cuerpo, params int[] idBoton, string numero)
+        public async Task<ActionResult> EnviarMensajeBoton(string cuerpo, string numero, params int[] idBoton)
         {
             if (idBoton == null || idBoton.Length == 0)
                 return BadRequest("Se debe proporcionar al menos un ID de botón.");
@@ -159,7 +176,6 @@ namespace ApiWhatsapp.Controller
             var respuesta = await EnviarMensaje(json);
             return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
-
 
         /// <summary>
         /// Cambia el estado de un mensaje a leído.

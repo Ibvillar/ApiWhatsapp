@@ -62,7 +62,6 @@
     {
         public string id { get; set; }
         public string mime_type { get; set; }
-        public string caption { get; set; }
     }
 
     public class MessageDocument
