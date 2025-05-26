@@ -20,6 +20,15 @@ builder.Services.AddDbContext<DbWhatsapp>(opciones =>
 builder.Services.AddDbContext<DbTerceros>(opciones =>
                     opciones.UseSqlServer("name=TercerosConecction"), ServiceLifetime.Scoped);
 
+//CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().WithExposedHeaders("*");
+    });
+});
+
 //Token
 //Ahora mismo no es funcional
 builder.Services.AddAuthentication().AddJwtBearer(opciones =>
@@ -51,15 +60,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     options.OperationFilter<AuthorizationFilter>();
-});
-
-//CORS
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(builder =>
-    {
-        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().WithExposedHeaders("*");
-    });
 });
 
 var app = builder.Build();

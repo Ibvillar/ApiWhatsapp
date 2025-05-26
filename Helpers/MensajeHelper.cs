@@ -132,7 +132,7 @@ namespace ApiWhatsapp.EnvioMensajes
             var jsonResponse = JsonSerializer.Deserialize<JsonElement>(content);
             if (jsonResponse.TryGetProperty("id", out JsonElement idProperty))
             {
-                return idProperty.GetString();
+                return idProperty.GetString()!;
             }
 
             throw new Exception("No se pudo obtener el ID del archivo subido.");

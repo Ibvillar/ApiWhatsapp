@@ -214,7 +214,7 @@ namespace ApiWhatsapp.BBDD
         /// <param name="idBoton">Identificador único del botón de respuesta (usado para identificar qué botón fue pulsado).</param>
         /// <param name="tituloBoton">Texto visible que se mostrará en el botón.</param>
         /// <returns>Objeto <see cref="MensajeBotonReply"/> listo para ser serializado y enviado a la API de WhatsApp.</returns>
-        public MensajeBotonReply ContruirMensajeBoton(string numero, string mensaje, string idBoton, string tituloBoton)
+        public MensajeBotonReply ContruirMensajeBoton(string numero, string mensaje, ButtonReply[] botones)
         {
             return new MensajeBotonReply
             {
@@ -230,22 +230,12 @@ namespace ApiWhatsapp.BBDD
                     },
                     action = new ActionReply
                     {
-                        buttons = new ButtonReply[]
-                        {
-                        new ButtonReply
-                        {
-                            type = "reply",
-                            reply = new Reply
-                            {
-                                id = idBoton,
-                                title = tituloBoton
-                            }
-                        }
-                    }
+                        buttons = botones
                     }
                 }
             };
         }
+
 
         /// <summary>
         /// Método base para construir un objeto Mensaje con datos comunes.

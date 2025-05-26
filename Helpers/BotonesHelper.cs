@@ -23,31 +23,30 @@ namespace ApiWhatsapp.Helpers
             switch (id)
             {
                 case 1:
-                    await ProcesarAccion(id, await _controller.IniciarJornada());
+                    await ProcesarAccion(id, await _controller.IniciarJornada(), mensaje.from);
                     break;
                 case 2:
-                    await ProcesarAccion(id, await _controller.PausarJornada());
+                    await ProcesarAccion(id, await _controller.PausarJornada(), mensaje.from);
                     break;
                 case 3:
-                    await ProcesarAccion(id, await _controller.ReanudarJornada());
+                    await ProcesarAccion(id, await _controller.ReanudarJornada(), mensaje.from);
                     break;
                 case 4:
-                    await ProcesarAccion(id, await _controller.FinalizarJornada());
+                    await ProcesarAccion(id, await _controller.FinalizarJornada(), mensaje.from);
                     break;
                 default:
-                    await _controller.MensajeError();
                     break;
             }
         }
 
-        private async Task ProcesarAccion(int idAccion, string error)
+        private async Task ProcesarAccion(int idAccion, string error, string numero)
         {
             var texto = ConstruirCuerpo(idAccion, error);
 
             // Determina los siguientes botones a mostrar según resultado
             var botonesSiguientes = ObtenerBotonesSiguientes(idAccion, error);
 
-            await _mensajeController.EnviarMensajeBoton(texto, botonesSiguientes);
+            await _mensajeController.EnviarMensajeBoton(texto, botonesSiguientes, numero);
         }
 
         private string ConstruirCuerpo(int id, string error)

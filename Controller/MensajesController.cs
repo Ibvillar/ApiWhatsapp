@@ -121,15 +121,37 @@ namespace ApiWhatsapp.Controller
         }
 
         [HttpPost("enviar-boton")]
-        public async Task<ActionResult> EnviarMensajeBoton(string cuerpo, params int[] idBoton)
+        public async Task<ActionResult> EnviarMensajeBoton(string cuerpo, params int[] idBoton, string numero)
         {
-            Boton boton = await botonRepository.GetBotonById(idBoton[0]);
+            if (idBoton == null || idBoton.Length == 0)
+                return BadRequest("Se debe proporcionar al menos un ID de botón.");
+
+            List<DTO.ButtonReply> botones = new List<DTO.ButtonReply>();
+
+            foreach (var id in idBoton.Take(3))
+            {
+                Boton boton = await botonRepository.GetBotonById(id);
+                if (boton == null)
+                    continue;
+
+                botones.Add(new DTO.ButtonReply
+                {
+                    type = "reply",
+                    reply = new Reply
+                    {
+                        id = id.ToString(),
+                        title = boton.Texto
+                    }
+                });
+            }
+
+            if (botones.Count == 0)
+                return BadRequest("No se pudieron construir botones válidos.");
 
             var mensaje = mensajeRepository.ContruirMensajeBoton(
-                "34673042406",
+                numero,
                 cuerpo,
-                idBoton[0].ToString(),
-                boton.Texto
+                botones.ToArray()
             );
 
             var json = CastToJson(mensaje);
@@ -137,6 +159,7 @@ namespace ApiWhatsapp.Controller
             var respuesta = await EnviarMensaje(json);
             return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
+
 
         /// <summary>
         /// Cambia el estado de un mensaje a leído.

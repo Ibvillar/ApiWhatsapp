@@ -1,8 +1,8 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Buffers;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Azure.Core.Serialization;
 
 namespace ApiWhatsapp.Controller
 {
@@ -68,15 +68,23 @@ namespace ApiWhatsapp.Controller
 
                 var response = await _httpClient.PostAsync(url, null);
 
+                string contenido = await response.Content.ReadAsStringAsync();
+
                 if (response.IsSuccessStatusCode)
                 {
-                    string resultado = await response.Content.ReadAsStringAsync();
                     return "";
                 }
                 else
                 {
-                    string error = await response.Content.ReadAsStringAsync();
-                    return error;
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(contenido);
+                        return GetMensajeError(doc);
+                    }
+                    catch
+                    {
+                        return contenido;
+                    }
                 }
             }
             catch (Exception ex)
@@ -98,17 +106,24 @@ namespace ApiWhatsapp.Controller
 
                 var response = await _httpClient.PostAsync(url, null);
 
+                string contenido = await response.Content.ReadAsStringAsync();
+
                 if (response.IsSuccessStatusCode)
                 {
-                    string resultado = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"✅ Respuesta del servidor: {resultado}");
+                    // El contenido ya es texto plano como "Jornada iniciada"
                     return "";
                 }
                 else
                 {
-                    string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"❌ Error: {response.StatusCode}\n{error}");
-                    return error;
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(contenido);
+                        return GetMensajeError(doc);
+                    }
+                    catch
+                    {
+                        return contenido;
+                    }
                 }
             }
             catch (Exception ex)
@@ -130,17 +145,24 @@ namespace ApiWhatsapp.Controller
 
                 var response = await _httpClient.PostAsync(url, null);
 
+                string contenido = await response.Content.ReadAsStringAsync();
+
                 if (response.IsSuccessStatusCode)
                 {
-                    string resultado = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"✅ Respuesta del servidor: {resultado}");
+                    // El contenido ya es texto plano como "Jornada iniciada"
                     return "";
                 }
                 else
                 {
-                    string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"❌ Error: {response.StatusCode}\n{error}");
-                    return error;
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(contenido);
+                        return GetMensajeError(doc);
+                    }
+                    catch
+                    {
+                        return contenido;
+                    }
                 }
             }
             catch (Exception ex)
@@ -162,17 +184,24 @@ namespace ApiWhatsapp.Controller
 
                 var response = await _httpClient.PostAsync(url, null);
 
+                string contenido = await response.Content.ReadAsStringAsync();
+
                 if (response.IsSuccessStatusCode)
                 {
-                    string resultado = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"✅ Respuesta del servidor: {resultado}");
+                    // El contenido ya es texto plano como "Jornada iniciada"
                     return "";
                 }
                 else
                 {
-                    string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"❌ Error: {response.StatusCode}\n{error}");
-                    return error;
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(contenido);
+                        return GetMensajeError(doc);
+                    }
+                    catch
+                    {
+                        return contenido;
+                    }
                 }
             }
             catch (Exception ex)
@@ -180,11 +209,6 @@ namespace ApiWhatsapp.Controller
                 Console.WriteLine(ex);
                 return "Ha ocurrido un error";
             }
-        }
-
-        public async Task MensajeError()
-        {
-
         }
 
         public class LoginDTO()
@@ -199,6 +223,31 @@ namespace ApiWhatsapp.Controller
             public string token { get; set; }
             [JsonPropertyName("expiration")]
             public DateTime expiration { get; set; }
+        }
+
+        private string GetMensajeError(JsonDocument doc)
+        {
+            var root = doc.RootElement;
+
+            // Manejo de errores tipo validation problem details
+            if (root.TryGetProperty("errors", out var errores))
+            {
+                foreach (var prop in errores.EnumerateObject())
+                {
+                    foreach (var msg in prop.Value.EnumerateArray())
+                    {
+                        return msg.GetString(); // Devuelve el primer mensaje de error encontrado
+                    }
+                }
+            }
+
+            // Por si hay un "message"
+            if (root.TryGetProperty("message", out var mensaje))
+            {
+                return mensaje.GetString();
+            }
+
+            return "error"; // Si no encuentra nada útil, devuelve todo
         }
     }
 }
