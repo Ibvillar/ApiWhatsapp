@@ -127,7 +127,7 @@
         }
       }
     },
-    "/mensajes/enviar-imagen/{numeroDestino}": {
+    "/mensajes/enviar-imagen": {
       "post": {
         "tags": [
           "Mensajes"
@@ -135,45 +135,12 @@
         "parameters": [
           {
             "name": "numeroDestino",
-            "in": "path",
-            "required": true,
+            "in": "query",
             "schema": {
               "type": "integer",
               "format": "int64"
             }
           }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              },
-              "encoding": {
-                "file": {
-                  "style": "form"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/mensajes/enviar-imagen": {
-      "post": {
-        "tags": [
-          "Mensajes"
         ],
         "requestBody": {
           "content": {
@@ -215,22 +182,28 @@
               "type": "integer",
               "format": "int64"
             }
-          },
-          {
-            "name": "nombre",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "ruta",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"

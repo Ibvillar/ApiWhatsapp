@@ -13,7 +13,7 @@ namespace ApiWhatsapp.Helpers
         public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion) 
         {
             _mensajeController = new MensajesController(context, contextTerceros, mapper, _configuracion);
-            _controller = new ControlPresenciaController();
+            _controller = new ControlPresenciaController(_configuracion);
         }
 
         public async Task ResponderMensaje(MessageWebhook mensaje)
@@ -49,43 +49,79 @@ namespace ApiWhatsapp.Helpers
             await _mensajeController.EnviarMensajeBoton(texto, numero, botonesSiguientes);
         }
 
-        private string ConstruirCuerpo(int id, string error)
+        private string ConstruirCuerpo(int id, string result)
         {
-            bool fallo = string.IsNullOrWhiteSpace(error);
+            bool fallo = !isError(result);
+            string horaActual = DateTime.Now.ToString("HH:mm");
+
             return id switch
             {
-                1 => fallo ? "Has iniciado la jornada" : $"No se ha podido iniciar la jornada: {error}",
-                2 => fallo ? "Has pausado la jornada" : $"No se ha podido pausar la jornada: {error}",
-                3 => fallo ? "Has reanudado la jornada" : $"No se ha podido reanudar la jornada: {error}",
-                4 => fallo ? "Has finalizado la jornada" : $"No se ha podido finalizar la jornada: {error}",
-                _ => "Ha ocurrido un error inesperado"
+                1 => fallo
+                    ? $"✅ Jornada iniciada con éxito.\n\n🕒 *Hora actual:* {horaActual}\n\n¡Buen trabajo! 🫡"
+                    : $"⚠️ *No se pudo iniciar la jornada* ⚠️\n\n🕒 *Hora actual:* {horaActual}\n🔁 Por favor, inténtalo de nuevo.\n\n🛠️ Detalle del error: {result}",
+
+                2 => fallo
+                    ? $"⏸️ Jornada pausada correctamente.\n\n🕒 *Hora actual:* {horaActual}\n⏱️ *Tiempo trabajado:* {result}\n\n¡Tómate un respiro! ☕"
+                    : $"❌ *No se pudo pausar la jornada.*\n\n🕒 *Hora actual:* {horaActual}\n🔁 Intenta nuevamente.\n\n🛠️ Detalle del error: {result}",
+
+                3 => fallo
+                    ? $"▶️ Jornada reanudada con éxito.\n\n🕒 *Hora actual:* {horaActual}\n\n¡Seguimos! 🚀"
+                    : $"❌ *No se pudo reanudar la jornada.*\n\n🕒 *Hora actual:* {horaActual}\n🔁 Por favor, vuelve a intentarlo.\n\n🛠️ Detalle del error: {result}",
+
+                4 => fallo
+                    ? $"✅ Jornada finalizada correctamente.\n\n🕒 *Hora actual:* {horaActual}\n⏱️ *Tiempo total trabajado:* {result}\n\n¡Buen trabajo hoy! 🎉"
+                    : $"❌ *No se pudo finalizar la jornada.*\n\n🕒 *Hora actual:* {horaActual}\n🔁 Intenta de nuevo más tarde.\n\n🛠️ Detalle del error: {result}",
+
+                _ => $"⚠️ *Ha ocurrido un error inesperado.*\n\n🕒 *Hora actual:* {horaActual}\n🔧 Por favor, intenta nuevamente o contacta al soporte si el problema persiste."
             };
         }
 
+
         private int[] ObtenerBotonesSiguientes(int idAccion, string error)
         {
-            bool fallo = !string.IsNullOrWhiteSpace(error);
+            bool fallo = isError(error);
 
             // Si hubo fallo, volvemos a enviar el mismo botón
             if (fallo)
             {
-                return new[] { idAccion };
+                return idAccion switch
+                {
+                    1 => [1, 2],
+                    2 => [1, 2, 3],
+                    3 => [1, 3, 4],
+                    4 => [1, 3, 4],
+                    _ => []
+                };
             }
 
             // Si todo salió bien, devolvemos los botones siguientes válidos
             return idAccion switch
             {
-                1 => new[] { 2, 4 }, // Después de iniciar: pausar o finalizar
-                2 => new[] { 3, 4 }, // Después de pausar: reanudar o finalizar
-                3 => new[] { 2, 4 }, // Después de reanudar: pausar o finalizar
-                4 => new[] { 1 },    // Después de finalizar: reiniciar la jornada
-                _ => Array.Empty<int>()
+                1 => [2, 4], // Después de iniciar: pausar o finalizar
+                2 => [3, 4], // Después de pausar: reanudar o finalizar
+                3 => [2, 4], // Después de reanudar: pausar o finalizar
+                4 => [1],    // Después de finalizar: reiniciar la jornada
+                _ => []
             };
         }
 
         private int GetId(MessageWebhook mensaje)
         {
             return int.Parse(mensaje.interactive.button_reply.id);
+        }
+
+        private bool isError(string result)
+        {
+            try
+            {
+                Console.WriteLine(result);
+                int.Parse(result.Substring(0, 2));
+
+                return false;
+            } catch
+            {
+                return true;
+            }
         }
 
     }

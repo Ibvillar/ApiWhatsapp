@@ -12,10 +12,10 @@ namespace ApiWhatsapp.Controller
         private readonly string URL;
         private string Cod;
 
-        public ControlPresenciaController()
+        public ControlPresenciaController(IConfiguration _configuration)
         {
             _httpClient = new HttpClient();
-            URL = "http://localhost:5113/";
+            URL = _configuration["RutaControlPresencia"]!;
         }
         
         public async Task<TokenValidationDTO> IniciarSesion(string Cod)
@@ -72,7 +72,7 @@ namespace ApiWhatsapp.Controller
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return "";
+                    return "00:00:00";
                 }
                 else
                 {
@@ -104,14 +104,14 @@ namespace ApiWhatsapp.Controller
 
                 var url = URL + "reloj/reanudar-jornada/" + Cod;
 
-                var response = await _httpClient.PostAsync(url, null);
+                var response = await _httpClient.PutAsync(url, null);
 
                 string contenido = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
                     // El contenido ya es texto plano como "Jornada iniciada"
-                    return "";
+                    return "00:00:00";
                 }
                 else
                 {
@@ -143,14 +143,16 @@ namespace ApiWhatsapp.Controller
 
                 var url = URL + "reloj/pausar-jornada/" + Cod;
 
-                var response = await _httpClient.PostAsync(url, null);
+                var response = await _httpClient.PutAsync(url, null);
 
                 string contenido = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
                     // El contenido ya es texto plano como "Jornada iniciada"
-                    return "";
+                    string mensaje = contenido.Substring(1, contenido.Length - 2);
+                    Console.WriteLine(mensaje);
+                    return mensaje;
                 }
                 else
                 {
@@ -182,14 +184,16 @@ namespace ApiWhatsapp.Controller
 
                 var url = URL + "reloj/finalizar-jornada/" + Cod;
 
-                var response = await _httpClient.PostAsync(url, null);
+                var response = await _httpClient.PutAsync(url, null);
 
                 string contenido = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
                     // El contenido ya es texto plano como "Jornada iniciada"
-                    return "";
+                    string mensaje = contenido.Substring(1, contenido.Length - 2);
+                    Console.WriteLine(mensaje);
+                    return mensaje;
                 }
                 else
                 {

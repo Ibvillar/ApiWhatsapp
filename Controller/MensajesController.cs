@@ -73,8 +73,7 @@ namespace ApiWhatsapp.Controller
         /// Envía una imagen a un número específico.
         /// </summary>
         /// <param name="numeroDestino">Número del destinatario</param>
-        /// <param name="ruta">Ruta del fichero de imagen</param>
-        [HttpPost("enviar-imagen/{numeroDestino}")]
+        /// <param name="file">Archivo de imagen a enviar</param>
         [HttpPost("enviar-imagen")]
         public async Task<ActionResult> EnviarMensajeImagen(long numeroDestino, IFormFile file)
         {
@@ -86,7 +85,7 @@ namespace ApiWhatsapp.Controller
                     return BadRequest("No se pudo guardar el archivo");
 
                 // Guardar referencia del archivo y el mensaje
-                int idFichero = await GuardarFichero(rutaArchivo.Substring(rutaArchivo.LastIndexOfAny("/".ToCharArray()), rutaArchivo.Last()));
+                int idFichero = await GuardarFichero(Path.GetFileName(rutaArchivo));
                 await GuardarMensaje(NumeroEmpresa, numeroDestino, "", idFichero);
 
                 // Construir y enviar el mensaje con imagen
@@ -103,32 +102,42 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-
         /// <summary>
         /// Envía un documento a un número específico.
         /// </summary>
         /// <param name="numeroDestino">Número del destinatario</param>
-        /// <param name="nombre">Nombre del documento</param>
-        /// <param name="ruta">Ruta del documento</param>
+        /// <param name="file">Archivo de documento a enviar</param>
         [HttpPost("enviar-documento")]
-        public async Task<ActionResult> EnviarMensajeDocumento(long numeroDestino, string nombre, string ruta)
+        public async Task<ActionResult> EnviarMensajeDocumento(long numeroDestino, IFormFile file)
         {
             try
             {
-                int idFichero = await GuardarFichero(ruta);
+                // Subir archivo y obtener la ruta donde se guardó
+                string rutaArchivo = await _mensajesHelper.UploadFile(file);
+                if (string.IsNullOrEmpty(rutaArchivo))
+                    return BadRequest("No se pudo guardar el archivo");
+
+                // Obtener nombre del documento para mostrar
+                string nombreDocumento = Path.GetFileName(rutaArchivo);
+
+                // Guardar referencia del archivo y el mensaje
+                int idFichero = await GuardarFichero(nombreDocumento);
                 await GuardarMensaje(NumeroEmpresa, numeroDestino, "", idFichero);
+
+                // Construir y enviar el mensaje con documento
+                var mensaje = await _mensajesHelper.ConstruirMensajeDocumento(numeroDestino, nombreDocumento, rutaArchivo);
+                var json = CastToJson(mensaje);
+
+                var respuesta = await EnviarMensaje(json);
+                return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.ToString());
                 return BadRequest(e.Message);
             }
-
-            var mensaje = await _mensajesHelper.ConstruirMensajeDocumento(numeroDestino, nombre, ruta);
-            var json = CastToJson(mensaje);
-
-            var respuesta = await EnviarMensaje(json);
-            return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
+
 
         /// <summary>
         /// Envía un mensaje con botones a un número de teléfono.

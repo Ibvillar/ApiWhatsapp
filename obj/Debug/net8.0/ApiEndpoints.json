@@ -129,13 +129,8 @@
         "IsRequired": false
       },
       {
-        "Name": "nombre",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "ruta",
-        "Type": "System.String",
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
         "IsRequired": false
       }
     ],
@@ -150,25 +145,9 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "file",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
-    "Method": "EnviarMensajeImagen",
-    "RelativePath": "mensajes/enviar-imagen/{numeroDestino}",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
         "Name": "numeroDestino",
         "Type": "System.Int64",
-        "IsRequired": true
+        "IsRequired": false
       },
       {
         "Name": "file",
