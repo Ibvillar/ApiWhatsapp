@@ -1,8 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
+using ApiWhatsapp.DTO;
 
 namespace ApiWhatsapp.Controller
 {
@@ -11,11 +10,14 @@ namespace ApiWhatsapp.Controller
         private readonly HttpClient _httpClient;
         private readonly string URL;
         private string Cod;
+        private TokenValidationDTO _tokenActual;
+
 
         public ControlPresenciaController(IConfiguration _configuration)
         {
             _httpClient = new HttpClient();
             URL = _configuration["RutaControlPresencia"]!;
+            Cod = String.Empty;
         }
         
         public async Task<TokenValidationDTO> IniciarSesion(string Cod)
@@ -56,11 +58,26 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        private async Task<TokenValidationDTO> ObtenerToken(string cod)
+        {
+            // Si ya hay un token y no ha expirado, lo reutilizamos
+            if (_tokenActual != null && _tokenActual.expiration > DateTime.UtcNow)
+            {
+                return _tokenActual;
+            }
+
+            // Si no hay token o ha expirado, obtenemos uno nuevo
+            _tokenActual = await IniciarSesion(cod);
+            return _tokenActual;
+        }
+
+
+
         public async Task<string> IniciarJornada(string cod)
         {
             try
             {
-                var token = await IniciarSesion(cod);
+                var token = await ObtenerToken(cod);
                 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
@@ -98,7 +115,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                var token = await IniciarSesion(cod);
+                var token = await ObtenerToken(cod);
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
@@ -137,7 +154,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                var token = await IniciarSesion(cod);
+                var token = await ObtenerToken(cod);
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
@@ -178,7 +195,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                var token = await IniciarSesion(cod);
+                var token = await ObtenerToken(cod);
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
@@ -215,20 +232,6 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        public class LoginDTO()
-        {
-            public string Cod { get; set; }
-            public string Password { get; set; }
-        }
-
-        public class TokenValidationDTO
-        {
-            [JsonPropertyName("token")]
-            public string token { get; set; }
-            [JsonPropertyName("expiration")]
-            public DateTime expiration { get; set; }
-        }
-
         private string GetMensajeError(JsonDocument doc)
         {
             var root = doc.RootElement;
@@ -240,7 +243,7 @@ namespace ApiWhatsapp.Controller
                 {
                     foreach (var msg in prop.Value.EnumerateArray())
                     {
-                        return msg.GetString(); // Devuelve el primer mensaje de error encontrado
+                        return msg.GetString()!; // Devuelve el primer mensaje de error encontrado
                     }
                 }
             }

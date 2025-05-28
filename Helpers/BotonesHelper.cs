@@ -62,7 +62,7 @@ namespace ApiWhatsapp.Helpers
             {
                 1 => fallo
                     ? $"✅ Jornada iniciada con éxito.\n\n🕒 *Hora actual:* {horaActual}\n\n¡Buen trabajo! 🫡"
-                    : $"⚠️ *No se pudo iniciar la jornada* ⚠️\n\n🕒 *Hora actual:* {horaActual}\n🔁 Por favor, inténtalo de nuevo.\n\n🛠️ Detalle del error: {result}",
+                    : $"❌ *No se pudo iniciar la jornada*\n\n🕒 *Hora actual:* {horaActual}\n🔁 Por favor, inténtalo de nuevo.\n\n🛠️ Detalle del error: {result}",
 
                 2 => fallo
                     ? $"⏸️ Jornada pausada correctamente.\n\n🕒 *Hora actual:* {horaActual}\n⏱️ *Tiempo trabajado:* {result}\n\n¡Tómate un respiro! ☕"
