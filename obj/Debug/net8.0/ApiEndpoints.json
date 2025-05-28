@@ -180,6 +180,22 @@
   },
   {
     "ContainingType": "ApiWhatsapp.Controller.MensajesController",
+    "Method": "EnviarMensajeBienvenida",
+    "RelativePath": "mensajes/mensaje-bienvenida",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "telefonoDTO",
+        "Type": "ApiWhatsapp.DTO.TelefonoWithGenerales",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.MensajesController",
     "Method": "GetMensajeById",
     "RelativePath": "mensajes/obtener-mensaje/{mensajeId}",
     "HttpMethod": "GET",

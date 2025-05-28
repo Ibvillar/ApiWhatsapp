@@ -279,6 +279,42 @@
         }
       }
     },
+    "/mensajes/mensaje-bienvenida": {
+      "post": {
+        "tags": [
+          "Mensajes"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelefonoWithGenerales"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelefonoWithGenerales"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelefonoWithGenerales"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelefonoWithGenerales"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/mensajes/cambiar-a-leido/{mensajeId}": {
       "put": {
         "tags": [
@@ -624,6 +660,10 @@
           "idTerceros": {
             "type": "integer",
             "format": "int32"
+          },
+          "idGenerales": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -660,6 +700,33 @@
           "nombre": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TelefonoWithGenerales": {
+        "required": [
+          "nombre",
+          "numero",
+          "prefijo"
+        ],
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "prefijo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "idGenerales": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

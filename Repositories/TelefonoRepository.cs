@@ -205,5 +205,40 @@ namespace ApiWhatsapp.BBDD
 
             return result;
         }
+
+        public async Task ValidateNumber(TelefonoDTO telefonoDTO)
+        {
+            try
+            {
+                long id = long.Parse(telefonoDTO.Prefijo.ToString() + telefonoDTO.Numero.ToString());
+
+                if (GetTelefonosById(id) is null)
+                {
+                    Telefono telefono = ConstruirTelefono(telefonoDTO.Numero, short.Parse(telefonoDTO.Prefijo.ToString()), telefonoDTO.Nombre);
+                   await AddTelefono(telefono);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.ToString());
+            }
+        }
+
+        public async Task<bool> AddCodigo(Telefono? telefono, int cod)
+        {
+
+            Console.WriteLine(cod);
+            telefono = await context.Telefonos.Where(x => x.Id == telefono!.Id).FirstOrDefaultAsync();
+
+            if (telefono is null)
+            {
+                throw new Exception("Este teleofono no existe");
+            }
+
+            telefono.IdGenerales = cod;
+            await context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

@@ -22,5 +22,8 @@ namespace ApiWhatsapp.Entitties
 
         [Column("ID_TERCEROS")]
         public int IdTerceros { get; set; }
+
+        [Column("ID_GENERALES")]
+        public int IdGenerales {  get; set; }
     }
 }
