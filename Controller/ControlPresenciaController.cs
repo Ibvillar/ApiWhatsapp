@@ -56,11 +56,11 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        public async Task<string> IniciarJornada()
+        public async Task<string> IniciarJornada(string cod)
         {
             try
             {
-                var token = await IniciarSesion("000999");
+                var token = await IniciarSesion(cod);
                 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
@@ -94,11 +94,11 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        public async Task<string> ReanudarJornada()
+        public async Task<string> ReanudarJornada(string cod)
         {
             try
             {
-                var token = await IniciarSesion("000999");
+                var token = await IniciarSesion(cod);
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
@@ -133,11 +133,11 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        public async Task<string> PausarJornada()
+        public async Task<string> PausarJornada(string cod)
         {
             try
             {
-                var token = await IniciarSesion("000999");
+                var token = await IniciarSesion(cod);
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
@@ -174,11 +174,11 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        public async Task<string> FinalizarJornada()
+        public async Task<string> FinalizarJornada(string cod)
         {
             try
             {
-                var token = await IniciarSesion("000999");
+                var token = await IniciarSesion(cod);
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 

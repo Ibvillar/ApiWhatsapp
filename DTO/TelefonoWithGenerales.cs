@@ -2,6 +2,6 @@
 {
     public class TelefonoWithGenerales: TelefonoDTO
     {
-        public int IdGenerales { get; set; }
+        public string IdGenerales { get; set; }
     }
 }

@@ -1,6 +1,8 @@
-﻿using ApiWhatsapp.Controller;
+﻿using ApiWhatsapp.BBDD;
+using ApiWhatsapp.Controller;
 using ApiWhatsapp.Data;
 using ApiWhatsapp.Entities;
+using ApiWhatsapp.Entitties;
 using AutoMapper;
 
 namespace ApiWhatsapp.Helpers
@@ -9,11 +11,13 @@ namespace ApiWhatsapp.Helpers
     {
         private readonly MensajesController _mensajeController;
         private readonly ControlPresenciaController _controller;
+        private readonly TelefonoRepository _telefonosRepository;
 
         public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion) 
         {
             _mensajeController = new MensajesController(context, contextTerceros, mapper, _configuracion);
             _controller = new ControlPresenciaController(_configuracion);
+            _telefonosRepository = new TelefonoRepository(context, contextTerceros, mapper);
         }
 
         public async Task ResponderMensaje(MessageWebhook mensaje)
@@ -23,16 +27,16 @@ namespace ApiWhatsapp.Helpers
             switch (id)
             {
                 case 1:
-                    await ProcesarAccion(id, await _controller.IniciarJornada(), mensaje.from);
+                    await ProcesarAccion(id, await _controller.IniciarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 2:
-                    await ProcesarAccion(id, await _controller.PausarJornada(), mensaje.from);
+                    await ProcesarAccion(id, await _controller.PausarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 3:
-                    await ProcesarAccion(id, await _controller.ReanudarJornada(), mensaje.from);
+                    await ProcesarAccion(id, await _controller.ReanudarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 4:
-                    await ProcesarAccion(id, await _controller.FinalizarJornada(), mensaje.from);
+                    await ProcesarAccion(id, await _controller.FinalizarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 default:
                     break;
@@ -122,6 +126,15 @@ namespace ApiWhatsapp.Helpers
             {
                 return true;
             }
+        }
+
+        private string GetCodFromNumber(string numero)
+        {
+            long longNumber = long.Parse(numero);
+
+            Telefono telefono = _telefonosRepository.GetTelefonosById(longNumber);
+
+            return telefono.IdGenerales;
         }
 
     }

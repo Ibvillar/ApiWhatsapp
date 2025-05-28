@@ -662,8 +662,8 @@
             "format": "int32"
           },
           "idGenerales": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -725,8 +725,8 @@
             "type": "string"
           },
           "idGenerales": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

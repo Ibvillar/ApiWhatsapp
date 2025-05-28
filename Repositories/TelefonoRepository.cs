@@ -224,7 +224,7 @@ namespace ApiWhatsapp.BBDD
             }
         }
 
-        public async Task<bool> AddCodigo(Telefono? telefono, int cod)
+        public async Task<bool> AddCodigo(Telefono? telefono, string cod)
         {
 
             Console.WriteLine(cod);
