@@ -1,85 +1,40 @@
 ﻿using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
+using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
+using ApiWhatsapp.Entitties;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiWhatsapp.Controller
 {
+    [ApiController]
+    [Route("control-presencia")]
     public class ControlPresenciaController
     {
         private readonly HttpClient _httpClient;
         private readonly string URL;
         private string Cod;
         private TokenValidationDTO _tokenActual;
+        private DbWhatsapp _context;
 
 
-        public ControlPresenciaController(IConfiguration _configuration)
+        public ControlPresenciaController(IConfiguration _configuration, DbWhatsapp _context)
         {
             _httpClient = new HttpClient();
             URL = _configuration["RutaControlPresencia"]!;
             Cod = String.Empty;
-        }
-        
-        public async Task<TokenValidationDTO> IniciarSesion(string Cod)
-        {
-            try
-            {
-                var login = new LoginDTO
-                {
-                    Cod = Cod,
-                    Password = "ANGEL"
-                };
-
-                var url = URL + "usuario/iniciar-sesion";
-
-                var json = JsonSerializer.Serialize(login);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(url, content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseJson = await response.Content.ReadAsStringAsync();
-                    var token = JsonSerializer.Deserialize<TokenValidationDTO>(responseJson);
-                    this.Cod = Cod;
-                    return token!;
-                }
-                else
-                {
-                    var error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error en la solicitud: {response.StatusCode}\n{error}");
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return null;
-            }
+            this._context = _context;
         }
 
-        private async Task<TokenValidationDTO> ObtenerToken(string cod)
-        {
-            // Si ya hay un token y no ha expirado, lo reutilizamos
-            if (_tokenActual != null && _tokenActual.expiration > DateTime.UtcNow)
-            {
-                return _tokenActual;
-            }
-
-            // Si no hay token o ha expirado, obtenemos uno nuevo
-            _tokenActual = await IniciarSesion(cod);
-            return _tokenActual;
-        }
-
-
-
+        [HttpPost("iniciar-jornada")]
         public async Task<string> IniciarJornada(string cod)
         {
             try
             {
                 var token = await ObtenerToken(cod);
-                
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
+
+                Console.WriteLine(token.token);
 
                 var url = URL + "reloj/empezar-jornada/" + Cod;
 
@@ -111,13 +66,12 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        public async Task<string> ReanudarJornada(string cod)
+        [HttpPost("reaunudar-jornada")]
+        public async Task<string> ReaunudarJornada(string cod)
         {
             try
             {
                 var token = await ObtenerToken(cod);
-
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/reanudar-jornada/" + Cod;
 
@@ -150,13 +104,12 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        [HttpPost("pausar-jornada")]
         public async Task<string> PausarJornada(string cod)
         {
             try
             {
                 var token = await ObtenerToken(cod);
-
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/pausar-jornada/" + Cod;
 
@@ -191,13 +144,12 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        [HttpPost("finalizar-jornada")]
         public async Task<string> FinalizarJornada(string cod)
         {
             try
             {
                 var token = await ObtenerToken(cod);
-
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/finalizar-jornada/" + Cod;
 
@@ -255,6 +207,43 @@ namespace ApiWhatsapp.Controller
             }
 
             return "error"; // Si no encuentra nada útil, devuelve todo
+        }
+
+        private async Task<TokenValidationDTO> ObtenerToken(string cod)
+        {
+
+            Telefono? telefono = await _context.Telefonos.FirstOrDefaultAsync(x => x.IdGenerales == cod);
+            if (telefono == null)
+                return null;
+
+            var url = $"{URL}usuario/obtener-token?userCod={Uri.EscapeDataString(cod)}&tokenValidation={Uri.EscapeDataString(telefono.Token)}";
+
+            // Crear la solicitud HTTP con header personalizado
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("userCod", cod);
+            request.Headers.Add("tokenValidation", telefono.Token);
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var tokenDto = JsonSerializer.Deserialize<TokenValidationDTO>(responseJson);
+
+                this.Cod = cod;
+
+                telefono.Token = tokenDto.token;
+
+                _context.Update(telefono);
+
+                return tokenDto;
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error en la solicitud: {response.StatusCode}\n{error}");
+                return null;
+            }
         }
     }
 }

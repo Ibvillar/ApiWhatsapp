@@ -189,27 +189,34 @@ namespace ApiWhatsapp.Controller
         }
 
         [HttpPost("mensaje-bienvenida")]
-        public async Task<ActionResult> EnviarMensajeBienvenida(TelefonoWithGenerales telefonoDTO)
+        public async Task<ActionResult> EnviarMensajeBienvenida(MensajeBienvenidaDTO mensaje)
         {
-            Console.WriteLine(telefonoDTO.IdGenerales);
-            Telefono telefono = mapper.Map<Telefono>(telefonoDTO);
+            try
+            {
+                Telefono telefono = mapper.Map<Telefono>(mensaje.Telefono);
 
-            await telefonoRepository.ValidateNumber(telefonoDTO);
-            await telefonoRepository.AddCodigo(telefono, telefonoDTO.IdGenerales);
+                await telefonoRepository.UpdateToken(telefonoRepository.GetTelefonosById(mensaje.Telefono.Numero).Id, mensaje.Token);
+                await telefonoRepository.ValidateNumber(mensaje.Telefono);
+                await telefonoRepository.AddCodigo(telefono, mensaje.Telefono.IdGenerales);
 
-            string cuerpo = "👋 Bienvenido a *INTSA*. Estamos encantados de tenerte con nosotros. 🎉\r\n\r\nAquí podrás gestionar tus jornadas laborales, pausar o reanudar tu actividad, y mantener todo bajo control.\r\n\r\nSi necesitas ayuda, escríbenos cuando quieras. 💬\r\n\r\n📌 *Tu cuenta ya está activa* y lista para usarse.\r\n\r\n¡Vamos a comenzar! 🚀";
+                string cuerpo = "👋 Bienvenido a *INTSA*. Estamos encantados de tenerte con nosotros. 🎉\r\n\r\nAquí podrás gestionar tus jornadas laborales, pausar o reanudar tu actividad, y mantener todo bajo control.\r\n\r\nSi necesitas ayuda, escríbenos cuando quieras. 💬\r\n\r\n📌 *Tu cuenta ya está activa* y lista para usarse.\r\n\r\n¡Vamos a comenzar! 🚀";
 
-            ActionResult result = await EnviarMensajeTexto(telefono.Id, cuerpo);
+                ActionResult result = await EnviarMensajeTexto(telefono.Id, cuerpo);
 
-            if (result is not OkResult)
-                return BadRequest("No se ha podido mandar el mensaje de bienvenida correctamente");
+                if (result is not OkResult)
+                    return BadRequest("No se ha podido mandar el mensaje de bienvenida correctamente");
 
-            result = await EnviarMensajeBoton("🎉 ¡Qué emoción! Esta es tu primera jornada con nosotros.\n\nDale al botón y comencemos con toda la energía 💪", telefono.Id.ToString(), 1);
+                result = await EnviarMensajeBoton("🎉 ¡Qué emoción! Esta es tu primera jornada con nosotros.\n\nDale al botón y comencemos con toda la energía 💪", telefono.Id.ToString(), 1);
 
-            if (result is not OkResult)
-                return BadRequest("Error al intentar mandar el mensaje de inicio de jornada");
+                if (result is not OkResult)
+                    return BadRequest("Error al intentar mandar el mensaje de inicio de jornada");
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
         }
 
         /// <summary>
@@ -302,10 +309,7 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-        /// <summary>
-        /// Elimina un mensaje por su ID.
-        /// </summary>
-        /// <param name="mensajeId">ID del mensaje</param>
+
         [HttpDelete("eliminar-mensaje/{mensajeId}")]
         public async Task<ActionResult> RemoveMensaje(int mensajeId)
         {

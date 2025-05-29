@@ -70,6 +70,13 @@ app.UseSwaggerUI();
 
 app.UseCors();
 
-app.MapControllers();
+try
+{
+    app.MapControllers();
+} catch (Exception e)
+{
+    Console.WriteLine(e);
+    return;
+}
 
 app.Run();

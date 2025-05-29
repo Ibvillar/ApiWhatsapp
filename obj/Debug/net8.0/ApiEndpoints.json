@@ -1,5 +1,109 @@
 [
   {
+    "ContainingType": "ApiWhatsapp.Controller.ControlPresenciaController",
+    "Method": "FinalizarJornada",
+    "RelativePath": "control-presencia/finalizar-jornada",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cod",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.String",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.ControlPresenciaController",
+    "Method": "IniciarJornada",
+    "RelativePath": "control-presencia/iniciar-jornada",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cod",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.String",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.ControlPresenciaController",
+    "Method": "PausarJornada",
+    "RelativePath": "control-presencia/pausar-jornada",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cod",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.String",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "ApiWhatsapp.Controller.ControlPresenciaController",
+    "Method": "ReaunudarJornada",
+    "RelativePath": "control-presencia/reaunudar-jornada",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cod",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.String",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "ApiWhatsapp.Controller.FicherosController",
     "Method": "AgregarFichero",
     "RelativePath": "fichero/agregar-fichero",
@@ -187,8 +291,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "telefonoDTO",
-        "Type": "ApiWhatsapp.DTO.TelefonoWithGenerales",
+        "Name": "mensaje",
+        "Type": "ApiWhatsapp.DTO.MensajeBienvenidaDTO",
         "IsRequired": true
       }
     ],

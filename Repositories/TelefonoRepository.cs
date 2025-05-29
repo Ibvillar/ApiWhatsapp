@@ -240,5 +240,16 @@ namespace ApiWhatsapp.BBDD
 
             return true;
         }
+
+        public async Task<bool> UpdateToken(long Id, string Token)
+        {
+            Telefono telefono = await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
+
+            if (telefono is null)
+                return false;
+
+            telefono.Token = Token;
+            return true;
+        }
     }
 }

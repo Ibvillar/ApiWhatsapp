@@ -16,7 +16,7 @@ namespace ApiWhatsapp.Helpers
         public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion) 
         {
             _mensajeController = new MensajesController(context, contextTerceros, mapper, _configuracion);
-            _controller = new ControlPresenciaController(_configuracion);
+            _controller = new ControlPresenciaController(_configuracion, context);
             _telefonosRepository = new TelefonoRepository(context, contextTerceros, mapper);
         }
 
@@ -33,7 +33,7 @@ namespace ApiWhatsapp.Helpers
                     await ProcesarAccion(id, await _controller.PausarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 3:
-                    await ProcesarAccion(id, await _controller.ReanudarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
+                    await ProcesarAccion(id, await _controller.ReaunudarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 4:
                     await ProcesarAccion(id, await _controller.FinalizarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);

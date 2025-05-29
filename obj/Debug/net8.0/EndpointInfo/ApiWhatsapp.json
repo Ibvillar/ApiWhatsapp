@@ -5,6 +5,158 @@
     "version": "1.0"
   },
   "paths": {
+    "/control-presencia/iniciar-jornada": {
+      "post": {
+        "tags": [
+          "ControlPresencia"
+        ],
+        "parameters": [
+          {
+            "name": "cod",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/control-presencia/reaunudar-jornada": {
+      "post": {
+        "tags": [
+          "ControlPresencia"
+        ],
+        "parameters": [
+          {
+            "name": "cod",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/control-presencia/pausar-jornada": {
+      "post": {
+        "tags": [
+          "ControlPresencia"
+        ],
+        "parameters": [
+          {
+            "name": "cod",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/control-presencia/finalizar-jornada": {
+      "post": {
+        "tags": [
+          "ControlPresencia"
+        ],
+        "parameters": [
+          {
+            "name": "cod",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/fichero/agregar-fichero": {
       "post": {
         "tags": [
@@ -288,22 +440,22 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/TelefonoWithGenerales"
+                "$ref": "#/components/schemas/MensajeBienvenidaDTO"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TelefonoWithGenerales"
+                "$ref": "#/components/schemas/MensajeBienvenidaDTO"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/TelefonoWithGenerales"
+                "$ref": "#/components/schemas/MensajeBienvenidaDTO"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/TelefonoWithGenerales"
+                "$ref": "#/components/schemas/MensajeBienvenidaDTO"
               }
             }
           }
@@ -633,6 +785,18 @@
         },
         "additionalProperties": false
       },
+      "MensajeBienvenidaDTO": {
+        "type": "object",
+        "properties": {
+          "telefono": {
+            "$ref": "#/components/schemas/TelefonoWithGenerales"
+          },
+          "token": {
+            "$ref": "#/components/schemas/TokenValidationDTO"
+          }
+        },
+        "additionalProperties": false
+      },
       "Telefono": {
         "required": [
           "nombre",
@@ -662,6 +826,10 @@
             "format": "int32"
           },
           "idGenerales": {
+            "type": "string",
+            "nullable": true
+          },
+          "token": {
             "type": "string",
             "nullable": true
           }
@@ -727,6 +895,20 @@
           "idGenerales": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TokenValidationDTO": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiration": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
