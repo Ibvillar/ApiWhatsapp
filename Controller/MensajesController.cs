@@ -11,6 +11,7 @@ using ApiWhatsapp.DTO;
 using Microsoft.IdentityModel.Tokens;
 using ApiWhatsapp.Repositories;
 using ApiWhatsapp.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiWhatsapp.Controller
 {
@@ -193,18 +194,26 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                Telefono telefono = mapper.Map<Telefono>(mensaje.Telefono);
-
                 long Id = long.Parse(mensaje.Telefono.Prefijo.ToString() + mensaje.Telefono.Numero.ToString());
-                Telefono telefono1 = await telefonoRepository.GetTelefonosById(Id);
 
-                if (telefono1 is null)
+                // Buscar teléfono existente
+                var telefonoDb = await telefonoRepository.GetTelefonosById(Id);
+
+                Telefono telefono;
+
+                if (telefonoDb is null)
                 {
-                    telefono1 = telefonoRepository.ConstruirTelefono(mensaje.Telefono.Numero, mensaje.Telefono.Prefijo, mensaje.Telefono.Nombre);
+                    telefono = telefonoRepository.ConstruirTelefono(mensaje.Telefono.Numero, mensaje.Telefono.Prefijo, mensaje.Telefono.Nombre);
                     await telefonoRepository.AddTelefono(telefono);
                 }
+                else
+                {
+                    telefono = telefonoDb;
+                }
 
-                await telefonoRepository.UpdateToken(telefono1.Id, mensaje.Token);
+                long telefonoId = telefono.Id;
+
+                await telefonoRepository.UpdateToken(telefonoId, mensaje.Token);
                 await telefonoRepository.ValidateNumber(mensaje.Telefono);
                 await telefonoRepository.AddCodigo(telefono, mensaje.Telefono.IdGenerales);
 

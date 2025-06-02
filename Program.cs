@@ -1,6 +1,5 @@
 using System.Text;
 using ApiWhatsapp.Data;
-using ApiWhatsapp.EnvioMensajes;
 using ApiWhatsapp.Helpers;
 using ApiWhatsapp.Swagger;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +16,7 @@ builder.Services.AddTransient<WebhookHelper>();
 
 builder.Services.AddDbContext<DbWhatsapp>(opciones =>
                     opciones.UseSqlServer("name=WhatsappConection"), ServiceLifetime.Scoped);
+
 builder.Services.AddDbContext<DbTerceros>(opciones =>
                     opciones.UseSqlServer("name=TercerosConecction"), ServiceLifetime.Scoped);
 

@@ -49,7 +49,7 @@ namespace ApiWhatsapp.BBDD
                 context.Telefonos.Add(telefono);
                 await context.SaveChangesAsync();
 
-                if (GetTelefonosById(telefono.Id) is null)
+                if (await GetTelefonosById(telefono.Id) is null)
                 {
                     return false;
                 }
@@ -110,8 +110,8 @@ namespace ApiWhatsapp.BBDD
             catch (Exception ex)
             {
                 Console.WriteLine("11111111111111111111");
-                Console.WriteLine(ex.Message);
-                return null!;
+                Console.WriteLine(ex.ToString());
+                return telefonos!;
             }
         }
 
@@ -122,16 +122,7 @@ namespace ApiWhatsapp.BBDD
         /// <returns>Objeto Teléfono si se encuentra, null en caso contrario</returns>
         public async Task<Telefono> GetTelefonosById(long Id)
         {
-            List<Telefono> telefonos = await GetTelefonos();
-
-            if (telefonos is null)
-            {
-                return null!;
-            }
-
-            Telefono telefono = telefonos.FirstOrDefault(x => x.Id == Id)!;
-
-            return telefono;
+            return await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
         }
 
         /// <summary>
@@ -152,8 +143,8 @@ namespace ApiWhatsapp.BBDD
 
             Telefono telefonoCompleto = mapper.Map<Telefono>(telefono);
             telefonoCompleto.IdTerceros = -1;
-            telefonoCompleto.IdGenerales = String.Empty;
-            telefonoCompleto.Token = String.Empty;
+            telefonoCompleto.IdGenerales = "";
+            telefonoCompleto.Token = "";
 
             return telefonoCompleto;
         }
@@ -221,9 +212,9 @@ namespace ApiWhatsapp.BBDD
             {
                 long id = long.Parse(telefonoDTO.Prefijo.ToString() + telefonoDTO.Numero.ToString());
 
-                if (GetTelefonosById(id) is null)
+                if (await GetTelefonosById(id) is null)
                 {
-                    Telefono telefono = ConstruirTelefono(telefonoDTO.Numero, short.Parse(telefonoDTO.Prefijo.ToString()), telefonoDTO.Nombre);
+                   Telefono telefono = ConstruirTelefono(telefonoDTO.Numero, short.Parse(telefonoDTO.Prefijo.ToString()), telefonoDTO.Nombre);
                    await AddTelefono(telefono);
                 }
             }
@@ -235,8 +226,6 @@ namespace ApiWhatsapp.BBDD
 
         public async Task<bool> AddCodigo(Telefono? telefono, string cod)
         {
-
-            Console.WriteLine(cod);
             telefono = await context.Telefonos.Where(x => x.Id == telefono!.Id).FirstOrDefaultAsync();
 
             if (telefono is null)
@@ -252,12 +241,13 @@ namespace ApiWhatsapp.BBDD
 
         public async Task<bool> UpdateToken(long Id, string Token)
         {
-            Telefono telefono = await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
+            Telefono? telefono = await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
 
             if (telefono is null)
                 return false;
 
             telefono.Token = Token;
+            await context.SaveChangesAsync();
             return true;
         }
     }

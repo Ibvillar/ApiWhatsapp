@@ -90,7 +90,7 @@ namespace ApiWhatsapp.Helpers
             {
                 return idAccion switch
                 {
-                    1 => [1, 2],
+                    1 => [1, 2, 3],
                     2 => [1, 2, 3],
                     3 => [1, 3, 4],
                     4 => [1, 3, 4],
