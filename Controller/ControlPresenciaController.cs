@@ -34,9 +34,9 @@ namespace ApiWhatsapp.Controller
             {
                 var token = await ObtenerToken(cod);
 
-                Console.WriteLine(token.token);
-
                 var url = URL + "reloj/empezar-jornada/" + Cod;
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var response = await _httpClient.PostAsync(url, null);
 
@@ -48,6 +48,7 @@ namespace ApiWhatsapp.Controller
                 }
                 else
                 {
+                    Console.WriteLine(response.StatusCode);
                     try
                     {
                         using var doc = JsonDocument.Parse(contenido);
@@ -72,6 +73,8 @@ namespace ApiWhatsapp.Controller
             try
             {
                 var token = await ObtenerToken(cod);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/reanudar-jornada/" + Cod;
 
@@ -110,6 +113,8 @@ namespace ApiWhatsapp.Controller
             try
             {
                 var token = await ObtenerToken(cod);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/pausar-jornada/" + Cod;
 
@@ -150,6 +155,8 @@ namespace ApiWhatsapp.Controller
             try
             {
                 var token = await ObtenerToken(cod);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/finalizar-jornada/" + Cod;
 
