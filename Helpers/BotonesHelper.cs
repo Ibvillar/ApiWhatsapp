@@ -27,16 +27,16 @@ namespace ApiWhatsapp.Helpers
             switch (id)
             {
                 case 1:
-                    await ProcesarAccion(id, await _controller.IniciarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
+                    await ProcesarAccion(id, await _controller.IniciarJornada(await GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 2:
-                    await ProcesarAccion(id, await _controller.PausarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
+                    await ProcesarAccion(id, await _controller.PausarJornada(await GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 3:
-                    await ProcesarAccion(id, await _controller.ReaunudarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
+                    await ProcesarAccion(id, await _controller.ReaunudarJornada(await GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 4:
-                    await ProcesarAccion(id, await _controller.FinalizarJornada(GetCodFromNumber(mensaje.from)), mensaje.from);
+                    await ProcesarAccion(id, await _controller.FinalizarJornada(await GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 default:
                     break;
@@ -128,11 +128,11 @@ namespace ApiWhatsapp.Helpers
             }
         }
 
-        private string GetCodFromNumber(string numero)
+        private async Task<string> GetCodFromNumber(string numero)
         {
             long longNumber = long.Parse(numero);
 
-            Telefono telefono = _telefonosRepository.GetTelefonosById(longNumber);
+            Telefono telefono = await _telefonosRepository.GetTelefonosById(longNumber);
 
             return telefono.IdGenerales;
         }

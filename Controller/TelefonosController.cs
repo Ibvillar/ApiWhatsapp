@@ -68,7 +68,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                List<Telefono> telefonos = telefonoRepository.GetTelefonos();
+                List<Telefono> telefonos = await telefonoRepository.GetTelefonos();
 
                 if (telefonos.IsNullOrEmpty())
                 {
@@ -93,7 +93,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                Telefono telefono = telefonoRepository.GetTelefonosById(telefonoId);
+                Telefono telefono = await telefonoRepository.GetTelefonosById(telefonoId);
 
                 if (telefono is null)
                 {

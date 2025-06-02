@@ -792,7 +792,8 @@
             "$ref": "#/components/schemas/TelefonoWithGenerales"
           },
           "token": {
-            "$ref": "#/components/schemas/TokenValidationDTO"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -895,20 +896,6 @@
           "idGenerales": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "TokenValidationDTO": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "nullable": true
-          },
-          "expiration": {
-            "type": "string",
-            "format": "date-time"
           }
         },
         "additionalProperties": false

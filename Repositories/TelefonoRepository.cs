@@ -99,16 +99,17 @@ namespace ApiWhatsapp.BBDD
         /// Obtiene una lista de todos los teléfonos.
         /// </summary>
         /// <returns>Lista de teléfonos. Lista vacía si no hay ninguno</returns>
-        public List<Telefono> GetTelefonos()
+        public async Task<List<Telefono>> GetTelefonos()
         {
             List<Telefono> telefonos = [];
             try
             {
-                telefonos = context.Telefonos.ToList();
+                telefonos = await context.Telefonos.ToListAsync();
                 return telefonos;
             }
             catch (Exception ex)
             {
+                Console.WriteLine("11111111111111111111");
                 Console.WriteLine(ex.Message);
                 return null!;
             }
@@ -119,15 +120,18 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="Id">ID del teléfono</param>
         /// <returns>Objeto Teléfono si se encuentra, null en caso contrario</returns>
-        public Telefono GetTelefonosById(long Id)
+        public async Task<Telefono> GetTelefonosById(long Id)
         {
-            List<Telefono> telefonos = GetTelefonos();
+            List<Telefono> telefonos = await GetTelefonos();
+
             if (telefonos is null)
             {
                 return null!;
             }
 
-            return telefonos.FirstOrDefault(x => x.Id == Id)!;
+            Telefono telefono = telefonos.FirstOrDefault(x => x.Id == Id)!;
+
+            return telefono;
         }
 
         /// <summary>
@@ -146,7 +150,12 @@ namespace ApiWhatsapp.BBDD
                 Nombre = nombre,
             };
 
-            return mapper.Map<Telefono>(telefono);
+            Telefono telefonoCompleto = mapper.Map<Telefono>(telefono);
+            telefonoCompleto.IdTerceros = -1;
+            telefonoCompleto.IdGenerales = String.Empty;
+            telefonoCompleto.Token = String.Empty;
+
+            return telefonoCompleto;
         }
 
         /// <summary>

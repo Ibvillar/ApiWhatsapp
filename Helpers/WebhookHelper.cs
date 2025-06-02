@@ -151,7 +151,7 @@ namespace ApiWhatsapp.Helpers
         /// <returns>Objeto Telefono</returns>
         private async Task<Telefono> ObtenerTelefono(MessageWebhook webhook, string numero1)
         {
-            var telefono = telefonoRepository.GetTelefonosById(long.Parse(webhook.from));
+            Telefono telefono = await telefonoRepository.GetTelefonosById(long.Parse(webhook.from));
 
             if (telefono is null)
             {

@@ -195,7 +195,16 @@ namespace ApiWhatsapp.Controller
             {
                 Telefono telefono = mapper.Map<Telefono>(mensaje.Telefono);
 
-                await telefonoRepository.UpdateToken(telefonoRepository.GetTelefonosById(mensaje.Telefono.Numero).Id, mensaje.Token);
+                long Id = long.Parse(mensaje.Telefono.Prefijo.ToString() + mensaje.Telefono.Numero.ToString());
+                Telefono telefono1 = await telefonoRepository.GetTelefonosById(Id);
+
+                if (telefono1 is null)
+                {
+                    telefono1 = telefonoRepository.ConstruirTelefono(mensaje.Telefono.Numero, mensaje.Telefono.Prefijo, mensaje.Telefono.Nombre);
+                    await telefonoRepository.AddTelefono(telefono);
+                }
+
+                await telefonoRepository.UpdateToken(telefono1.Id, mensaje.Token);
                 await telefonoRepository.ValidateNumber(mensaje.Telefono);
                 await telefonoRepository.AddCodigo(telefono, mensaje.Telefono.IdGenerales);
 
