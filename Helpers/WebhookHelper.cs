@@ -5,6 +5,7 @@ using ApiWhatsapp.Entitties;
 using AutoMapper;
 using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entities;
+using ApiWhatsapp.Repositories;
 
 namespace ApiWhatsapp.Helpers
 {
@@ -24,6 +25,7 @@ namespace ApiWhatsapp.Helpers
         private readonly string ruta;
         private readonly BotonesHelper botonesHelper;
         private readonly IMapper mapper;
+        private readonly LocalizacionRepository localizacionRepository;
 
         /// <summary>
         /// Constructor de la clase WebhookHelper.
@@ -41,6 +43,7 @@ namespace ApiWhatsapp.Helpers
             _configuration = configuration;
             ruta = _configuration["RutaFicheros"]!;
             botonesHelper = new BotonesHelper(context, contextTerceros, mapper, configuration);
+            localizacionRepository = new LocalizacionRepository(context);
         }
 
         /// <summary>
@@ -76,6 +79,10 @@ namespace ApiWhatsapp.Helpers
                 case "interactive":
                     await GuardarMensajeBoton(mensaje);
                     await botonesHelper.ResponderMensaje(mensaje);
+                    break;
+
+                case "location":
+                    await ActualizarLocalizacion(mensaje);
                     break;
 
                 default:
@@ -192,6 +199,25 @@ namespace ApiWhatsapp.Helpers
             }
 
             return null;
+        }
+
+        private async Task ActualizarLocalizacion(MessageWebhook mensaje)
+        {
+            Console.WriteLine($"Longitud: {mensaje.location.longitude}, Latitud: {mensaje.location.latitude}");
+            try
+            {
+                Localizacion localizacion = await localizacionRepository.GetLocalizacionByPosicion(mensaje.location.longitude,
+                    mensaje.location.latitude, long.Parse(mensaje.from));
+
+                if (localizacion is null)
+                    return;
+
+                await localizacionRepository.ActualizarTiempo(localizacion.Id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         /// <summary>

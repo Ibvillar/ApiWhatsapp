@@ -17,5 +17,7 @@ namespace ApiWhatsapp.Data
         public DbSet<Prefijos> Prefijos { get; set; }
 
         public DbSet<Boton> Botones { get; set; }
+
+        public DbSet<Localizacion> Localizaciones { get; set; }
     }
 }

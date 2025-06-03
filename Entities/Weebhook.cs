@@ -51,6 +51,7 @@
         public MessageImage image { get; set; }
         public MessageDocument document { get; set; }
         public Interactive interactive { get; set; }
+        public Location location { get; set; }
     }
 
     public class MessageText
@@ -81,5 +82,13 @@
     {
         public string id { get; set; }
         public string title { get; set; }
+    }
+
+    public class Location
+    {
+        public float latitude { get; set; }
+        public float longitude { get; set; }
+        public string name { get; set; }
+        public string address { get; set; }
     }
 }

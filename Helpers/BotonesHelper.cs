@@ -3,6 +3,7 @@ using ApiWhatsapp.Controller;
 using ApiWhatsapp.Data;
 using ApiWhatsapp.Entities;
 using ApiWhatsapp.Entitties;
+using ApiWhatsapp.Repositories;
 using AutoMapper;
 
 namespace ApiWhatsapp.Helpers
@@ -12,17 +13,29 @@ namespace ApiWhatsapp.Helpers
         private readonly MensajesController _mensajeController;
         private readonly ControlPresenciaController _controller;
         private readonly TelefonoRepository _telefonosRepository;
+        private readonly LocalizacionRepository _localizacionRepository;
 
         public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion) 
         {
             _mensajeController = new MensajesController(context, contextTerceros, mapper, _configuracion);
             _controller = new ControlPresenciaController(_configuracion, context);
             _telefonosRepository = new TelefonoRepository(context, contextTerceros, mapper);
+            _localizacionRepository = new LocalizacionRepository(context);
         }
 
         public async Task ResponderMensaje(MessageWebhook mensaje)
         {
             int id = GetId(mensaje);
+
+            var codUsuario = await GetCodFromNumber(mensaje.from);
+
+            bool tieneUbicacion = await _localizacionRepository.UsuarioTieneLocalizacionValida(long.Parse(mensaje.from));
+
+            if (!tieneUbicacion)
+            {
+                await _mensajeController.EnviarMensajeTexto(long.Parse(mensaje.from), "📍 Por favor, comparte tu ubicación antes de registrar la jornada.");
+                return;
+            }
 
             switch (id)
             {

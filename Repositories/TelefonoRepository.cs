@@ -145,6 +145,7 @@ namespace ApiWhatsapp.BBDD
             telefonoCompleto.IdTerceros = -1;
             telefonoCompleto.IdGenerales = "";
             telefonoCompleto.Token = "";
+            telefonoCompleto.ubicacion = false;
 
             return telefonoCompleto;
         }
@@ -236,6 +237,18 @@ namespace ApiWhatsapp.BBDD
             telefono.IdGenerales = cod;
             await context.SaveChangesAsync();
 
+            return true;
+        }
+
+        public async Task<bool> SetUbicacion(bool estado, long Id)
+        {
+            Telefono telefono = await GetTelefonosById(Id);
+
+            if (telefono is null)
+                return false;
+
+            telefono.ubicacion = estado;
+            await context.SaveChangesAsync();
             return true;
         }
 
