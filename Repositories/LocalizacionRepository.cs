@@ -1,6 +1,5 @@
 ﻿using ApiWhatsapp.Data;
 using ApiWhatsapp.Entities;
-using ApiWhatsapp.Entitties;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiWhatsapp.Repositories
@@ -36,9 +35,14 @@ namespace ApiWhatsapp.Repositories
         {
             var ahora = DateOnly.FromDateTime(DateTime.UtcNow);
 
-            var localizacionReciente = await context.Localizaciones
-                .Where(x => x.IdTelefono == telefonoId && x.Dia == ahora)
-                .FirstOrDefaultAsync();
+            var localizacionReciente = await (
+                from loc in context.Localizaciones
+                join tel in context.Telefonos
+                    on loc.IdTelefono equals tel.Id
+                where loc.IdTelefono == telefonoId && loc.Dia == ahora
+                && tel.ubicacion == true
+                select loc
+            ).FirstOrDefaultAsync();
 
             return localizacionReciente != null;
         }

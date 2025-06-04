@@ -13,10 +13,12 @@ namespace ApiWhatsapp.Controller
     public class FicherosController : ControllerBase
     {
         private FicheroRepository ficheroRepository;
+        private IConfiguration _configuration;
 
-        public FicherosController(DbWhatsapp context, IMapper mapper)
+        public FicherosController(DbWhatsapp context, IMapper mapper, IConfiguration configuration)
         {
             ficheroRepository = new FicheroRepository(context, mapper);
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -76,7 +78,7 @@ namespace ApiWhatsapp.Controller
                     fichero.Ruta = fichero.Ruta.Replace('\\', '/');
                 }
 
-                return Ok(ficheros);
+                return Ok(_configuration["RutaFicheros"]! + ficheros);
             }
             catch (Exception e)
             {

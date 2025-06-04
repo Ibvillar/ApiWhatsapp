@@ -211,9 +211,9 @@ namespace ApiWhatsapp.Controller
                 await telefonoRepository.UpdateToken(telefonoId, mensaje.Token);
                 await telefonoRepository.ValidateNumber(mensaje.Telefono);
                 await telefonoRepository.AddCodigo(telefono, mensaje.Telefono.IdGenerales);
-                await telefonoRepository.SetUbicacion(true, telefonoId);
+                await telefonoRepository.SetUbicacion(mensaje.ubicacion, telefonoId);
 
-                string cuerpo = "👋 Bienvenido a *INTSA*. Estamos encantados de tenerte con nosotros. 🎉\r\n\r\nAquí podrás gestionar tus jornadas laborales, pausar o reanudar tu actividad, y mantener todo bajo control.\r\n\r\nSi necesitas ayuda, escríbenos cuando quieras. 💬\r\n\r\n📌 *Tu cuenta ya está activa* y lista para usarse.\r\n\r\n¡Vamos a comenzar! 🚀";
+                string cuerpo = $"👋 Bienvenido {telefono.Nombre}. Estamos encantados de tenerte con nosotros. 🎉\r\n\r\nAquí podrás gestionar tus jornadas laborales, pausar o reanudar tu actividad, y mantener todo bajo control.\r\n\r\nSi necesitas ayuda, escríbenos cuando quieras. 💬\r\n\r\n📌 *Tu cuenta ya está activa* y lista para usarse.\r\n\r\n¡Vamos a comenzar! 🚀";
 
                 ActionResult result = await EnviarMensajeTexto(telefono.Id, cuerpo);
 

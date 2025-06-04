@@ -4,5 +4,7 @@
     {
         public TelefonoWithGenerales Telefono { get; set; }
         public string Token { get; set; }
+
+        public bool ubicacion {  get; set; }
     }
 }

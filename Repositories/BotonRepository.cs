@@ -1,5 +1,4 @@
 ﻿using ApiWhatsapp.Data;
-
 using ApiWhatsapp.Entities;
 using Microsoft.EntityFrameworkCore;
 

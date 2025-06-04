@@ -794,6 +794,9 @@
           "token": {
             "type": "string",
             "nullable": true
+          },
+          "ubicacion": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
