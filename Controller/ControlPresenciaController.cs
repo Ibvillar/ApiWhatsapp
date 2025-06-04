@@ -1,14 +1,17 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json;
-using ApiWhatsapp.Data;
+﻿using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace ApiWhatsapp.Controller
 {
+    /// <summary>
+    /// Controlador encargado de gestionar el control de presencia de usuarios (inicio, pausa, reanudación y finalización de jornada).
+    /// </summary>
     [ApiController]
     [Route("control-presencia")]
     public class ControlPresenciaController
@@ -19,7 +22,14 @@ namespace ApiWhatsapp.Controller
         private TokenValidationDTO _tokenActual;
         private DbWhatsapp _context;
 
-
+        /// <summary>
+        /// Constructor del controlador de control de presencia.
+        /// </summary>
+        /// <param name="_configuration">Configuración de la aplicación.</param>
+        /// <param name="mensajes">Instancia del controlador de mensajes.</param>
+        /// <param name="_context">Contexto de la base de datos principal.</param>
+        /// <param name="terceros">Contexto de base de datos de terceros.</param>
+        /// <param name="mapper">Instancia de AutoMapper.</param>
         public ControlPresenciaController(IConfiguration _configuration, MensajesController mensajes, DbWhatsapp _context, DbTerceros terceros, IMapper mapper)
         {
             _httpClient = new HttpClient();
@@ -28,6 +38,11 @@ namespace ApiWhatsapp.Controller
             this._context = _context;
         }
 
+        /// <summary>
+        /// Inicia la jornada laboral para un usuario dado su código.
+        /// </summary>
+        /// <param name="cod">Código del usuario.</param>
+        /// <returns>Mensaje con el resultado de la operación.</returns>
         [HttpPost("iniciar-jornada")]
         public async Task<string> IniciarJornada(string cod)
         {
@@ -35,32 +50,16 @@ namespace ApiWhatsapp.Controller
             {
                 Console.WriteLine(cod);
                 var token = await ObtenerToken(cod);
-
                 var url = URL + "reloj/empezar-jornada/" + Cod;
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
-
                 var response = await _httpClient.PostAsync(url, null);
-
                 string contenido = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
-                {
                     return "00:00:00";
-                }
                 else
-                {
-                    Console.WriteLine(response.StatusCode);
-                    try
-                    {
-                        using var doc = JsonDocument.Parse(contenido);
-                        return GetMensajeError(doc);
-                    }
-                    catch
-                    {
-                        return contenido;
-                    }
-                }
+                    return TryParseError(contenido);
             }
             catch (Exception ex)
             {
@@ -69,38 +68,24 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Reanuda una jornada previamente pausada.
+        /// </summary>
+        /// <param name="cod">Código del usuario.</param>
+        /// <returns>Mensaje con el resultado de la operación.</returns>
         [HttpPost("reaunudar-jornada")]
         public async Task<string> ReaunudarJornada(string cod)
         {
             try
             {
                 var token = await ObtenerToken(cod);
-
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/reanudar-jornada/" + Cod;
-
                 var response = await _httpClient.PutAsync(url, null);
-
                 string contenido = await response.Content.ReadAsStringAsync();
 
-                if (response.IsSuccessStatusCode)
-                {
-                    // El contenido ya es texto plano como "Jornada iniciada"
-                    return "00:00:00";
-                }
-                else
-                {
-                    try
-                    {
-                        using var doc = JsonDocument.Parse(contenido);
-                        return GetMensajeError(doc);
-                    }
-                    catch
-                    {
-                        return contenido;
-                    }
-                }
+                return response.IsSuccessStatusCode ? "00:00:00" : TryParseError(contenido);
             }
             catch (Exception ex)
             {
@@ -109,40 +94,26 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Pausa la jornada actual del usuario.
+        /// </summary>
+        /// <param name="cod">Código del usuario.</param>
+        /// <returns>Mensaje con el resultado de la operación.</returns>
         [HttpPost("pausar-jornada")]
         public async Task<string> PausarJornada(string cod)
         {
             try
             {
                 var token = await ObtenerToken(cod);
-
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/pausar-jornada/" + Cod;
-
                 var response = await _httpClient.PutAsync(url, null);
-
                 string contenido = await response.Content.ReadAsStringAsync();
 
-                if (response.IsSuccessStatusCode)
-                {
-                    // El contenido ya es texto plano como "Jornada iniciada"
-                    string mensaje = contenido.Substring(1, contenido.Length - 2);
-                    Console.WriteLine(mensaje);
-                    return mensaje;
-                }
-                else
-                {
-                    try
-                    {
-                        using var doc = JsonDocument.Parse(contenido);
-                        return GetMensajeError(doc);
-                    }
-                    catch
-                    {
-                        return contenido;
-                    }
-                }
+                return response.IsSuccessStatusCode
+                    ? contenido.Substring(1, contenido.Length - 2)
+                    : TryParseError(contenido);
             }
             catch (Exception ex)
             {
@@ -151,40 +122,26 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Finaliza la jornada laboral del usuario.
+        /// </summary>
+        /// <param name="cod">Código del usuario.</param>
+        /// <returns>Mensaje con el resultado de la operación.</returns>
         [HttpPost("finalizar-jornada")]
         public async Task<string> FinalizarJornada(string cod)
         {
             try
             {
                 var token = await ObtenerToken(cod);
-
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
                 var url = URL + "reloj/finalizar-jornada/" + Cod;
-
                 var response = await _httpClient.PutAsync(url, null);
-
                 string contenido = await response.Content.ReadAsStringAsync();
 
-                if (response.IsSuccessStatusCode)
-                {
-                    // El contenido ya es texto plano como "Jornada iniciada"
-                    string mensaje = contenido.Substring(1, contenido.Length - 2);
-                    Console.WriteLine(mensaje);
-                    return mensaje;
-                }
-                else
-                {
-                    try
-                    {
-                        using var doc = JsonDocument.Parse(contenido);
-                        return GetMensajeError(doc);
-                    }
-                    catch
-                    {
-                        return contenido;
-                    }
-                }
+                return response.IsSuccessStatusCode
+                    ? contenido.Substring(1, contenido.Length - 2)
+                    : TryParseError(contenido);
             }
             catch (Exception ex)
             {
@@ -193,41 +150,42 @@ namespace ApiWhatsapp.Controller
             }
         }
 
+        /// <summary>
+        /// Extrae el mensaje de error desde un documento JSON de error HTTP.
+        /// </summary>
+        /// <param name="doc">Documento JSON con detalles del error.</param>
+        /// <returns>Primer mensaje de error encontrado, o mensaje genérico.</returns>
         private string GetMensajeError(JsonDocument doc)
         {
             var root = doc.RootElement;
 
-            // Manejo de errores tipo validation problem details
             if (root.TryGetProperty("errors", out var errores))
             {
                 foreach (var prop in errores.EnumerateObject())
                 {
                     foreach (var msg in prop.Value.EnumerateArray())
-                    {
-                        return msg.GetString()!; // Devuelve el primer mensaje de error encontrado
-                    }
+                        return msg.GetString()!;
                 }
             }
 
-            // Por si hay un "message"
             if (root.TryGetProperty("message", out var mensaje))
-            {
                 return mensaje.GetString();
-            }
 
-            return "error"; // Si no encuentra nada útil, devuelve todo
+            return "error";
         }
 
+        /// <summary>
+        /// Obtiene un token de autenticación válido para el usuario.
+        /// </summary>
+        /// <param name="cod">Código del usuario.</param>
+        /// <returns>Objeto <see cref="TokenValidationDTO"/> con el token actualizado.</returns>
         private async Task<TokenValidationDTO> ObtenerToken(string cod)
         {
-
             Telefono? telefono = await _context.Telefonos.FirstOrDefaultAsync(x => x.IdGenerales == cod);
-            if (telefono == null)
-                return null;
+            if (telefono == null) return null;
 
             var url = $"{URL}usuario/obtener-token?userCod={Uri.EscapeDataString(cod)}&tokenValidation={Uri.EscapeDataString(telefono.Token)}";
 
-            // Crear la solicitud HTTP con header personalizado
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("userCod", cod);
             request.Headers.Add("tokenValidation", telefono.Token);
@@ -240,7 +198,6 @@ namespace ApiWhatsapp.Controller
                 var tokenDto = JsonSerializer.Deserialize<TokenValidationDTO>(responseJson);
 
                 this.Cod = cod;
-
                 telefono.Token = tokenDto.token;
 
                 _context.Update(telefono);
@@ -252,6 +209,24 @@ namespace ApiWhatsapp.Controller
                 var error = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"Error en la solicitud: {response.StatusCode}\n{error}");
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Intenta extraer un mensaje de error de una cadena JSON.
+        /// </summary>
+        /// <param name="contenido">Contenido JSON como string.</param>
+        /// <returns>Mensaje de error legible.</returns>
+        private string TryParseError(string contenido)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(contenido);
+                return GetMensajeError(doc);
+            }
+            catch
+            {
+                return contenido;
             }
         }
     }

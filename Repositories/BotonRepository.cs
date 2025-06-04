@@ -1,42 +1,52 @@
 ﻿using ApiWhatsapp.Data;
+
 using ApiWhatsapp.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApiWhatsapp.Repositories
+/// <summary>
+/// Repositorio para gestionar las operaciones relacionadas con los botones en la base de datos.
+/// </summary>
+public class BotonRepository
 {
-    public class BotonRepository
+    private readonly DbWhatsapp context;
+
+    public BotonRepository(DbWhatsapp context)
     {
+        this.context = context;
+    }
 
-        private readonly DbWhatsapp context;
-        public BotonRepository(DbWhatsapp context) 
+    /// <summary>
+    /// Obtiene un botón por su ID.
+    /// </summary>
+    /// <param name="id">ID del botón a buscar.</param>
+    /// <returns>El objeto Boton si se encuentra; de lo contrario, null.</returns>
+    public async Task<Boton?> GetBotonById(int id)
+    {
+        try
         {
-            this.context = context;
+            return await context.Botones.FirstOrDefaultAsync(x => x.Id == id);
         }
-
-        public async Task<Boton> GetBotonById(int id)
+        catch (Exception ex)
         {
-            try
-            {
-                return await context.Botones.FirstOrDefaultAsync(x => x.Id == id);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
+            Console.WriteLine(ex.Message);
+            return null;
         }
+    }
 
-        public async Task<List<Boton>> GetBotones()
+    /// <summary>
+    /// Obtiene la lista de todos los botones disponibles.
+    /// </summary>
+    /// <returns>Lista de objetos Boton; o null en caso de error.</returns>
+    public async Task<List<Boton>> GetBotones()
+    {
+        try
         {
-            try
-            {
-                return await context.Botones.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
+            return await context.Botones.ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return null!;
         }
     }
 }

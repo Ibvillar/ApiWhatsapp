@@ -27,11 +27,6 @@ namespace ApiWhatsapp.Helpers
         private readonly IMapper mapper;
         private readonly LocalizacionRepository localizacionRepository;
 
-        /// <summary>
-        /// Constructor de la clase WebhookHelper.
-        /// </summary>
-        /// <param name="context">Contexto de base de datos</param>
-        /// <param name="mapper">Instancia de AutoMapper</param>
         public WebhookHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration configuration)
         {
             this.context = context;
@@ -49,8 +44,8 @@ namespace ApiWhatsapp.Helpers
         /// <summary>
         /// Guarda un mensaje recibido por el webhook, junto con la información del teléfono si es necesario.
         /// </summary>
-        /// <param name="mensaje">Mensaje recibido desde el webhook</param>
-        /// <param name="nombre">Nombre asociado al número si es nuevo</param>
+        /// <param name="mensaje">Mensaje recibido desde el webhook.</param>
+        /// <param name="numero">Nombre o identificador asociado al número.</param>
         public async Task GuardarMensaje(MessageWebhook mensaje, string numero)
         {
             await ObtenerTelefono(mensaje, numero);
@@ -58,8 +53,9 @@ namespace ApiWhatsapp.Helpers
         }
 
         /// <summary>
-        /// Identifica el tipo de mensaje y ejecuta la lógica correspondiente.
+        /// Identifica el tipo de mensaje recibido y ejecuta la lógica correspondiente.
         /// </summary>
+        /// <param name="mensaje">Mensaje recibido del webhook.</param>
         private async Task GetMensajePorTipo(MessageWebhook mensaje)
         {
             switch (mensaje.type)
@@ -69,9 +65,6 @@ namespace ApiWhatsapp.Helpers
                     break;
 
                 case "image":
-                    await GuardarMensajeArchivo(mensaje);
-                    break;
-
                 case "document":
                     await GuardarMensajeArchivo(mensaje);
                     break;
@@ -94,6 +87,7 @@ namespace ApiWhatsapp.Helpers
         /// <summary>
         /// Guarda un mensaje de archivo (imagen o documento) en el sistema.
         /// </summary>
+        /// <param name="mensaje">Mensaje con archivo multimedia.</param>
         private async Task GuardarMensajeArchivo(MessageWebhook mensaje)
         {
             string rutaArchivo = "";
@@ -120,6 +114,10 @@ namespace ApiWhatsapp.Helpers
             }
         }
 
+        /// <summary>
+        /// Guarda un mensaje de tipo botón interactivo en la base de datos.
+        /// </summary>
+        /// <param name="mensaje">Mensaje interactivo recibido.</param>
         private async Task GuardarMensajeBoton(MessageWebhook mensaje)
         {
             try
@@ -138,6 +136,7 @@ namespace ApiWhatsapp.Helpers
         /// <summary>
         /// Guarda un mensaje de texto en la base de datos.
         /// </summary>
+        /// <param name="mensaje">Mensaje de texto recibido.</param>
         private async Task GuardarMensajeTexto(MessageWebhook mensaje)
         {
             var mensajeTexto = mensajeRepository.ConstruirMensajeTexto(
@@ -149,9 +148,9 @@ namespace ApiWhatsapp.Helpers
         /// <summary>
         /// Obtiene un teléfono de la base de datos o lo crea si no existe.
         /// </summary>
-        /// <param name="webhook">Mensaje recibido</param>
-        /// <param name="nombre">Nombre a asociar si es nuevo</param>
-        /// <returns>Objeto Telefono</returns>
+        /// <param name="webhook">Mensaje recibido desde el webhook.</param>
+        /// <param name="numero1">Nombre o alias para asociar al teléfono si es nuevo.</param>
+        /// <returns>Objeto Telefono correspondiente.</returns>
         private async Task<Telefono> ObtenerTelefono(MessageWebhook webhook, string numero1)
         {
             Telefono telefono = await telefonoRepository.GetTelefonosById(long.Parse(webhook.from));
@@ -175,8 +174,8 @@ namespace ApiWhatsapp.Helpers
         /// <summary>
         /// Detecta el prefijo y el número local a partir del número completo.
         /// </summary>
-        /// <param name="numeroCompleto">Número telefónico completo</param>
-        /// <returns>Tupla con prefijo y número sin prefijo</returns>
+        /// <param name="numeroCompleto">Número telefónico completo.</param>
+        /// <returns>Tupla con prefijo y número sin prefijo, o null si no se detecta.</returns>
         public (short prefijo, int numeroSinPrefijo)? DetectarPrefijo(long numeroCompleto)
         {
             string numeroStr = numeroCompleto.ToString();
@@ -195,6 +194,10 @@ namespace ApiWhatsapp.Helpers
             return null;
         }
 
+        /// <summary>
+        /// Guarda la localización enviada en el mensaje si no existe una localización del mismo día.
+        /// </summary>
+        /// <param name="mensaje">Mensaje con la localización.</param>
         private async Task GuardarLocalizacion(MessageWebhook mensaje)
         {
             Console.WriteLine($"Longitud: {mensaje.location.longitude}, Latitud: {mensaje.location.latitude}");
@@ -205,7 +208,7 @@ namespace ApiWhatsapp.Helpers
 
                 if (localizacion is not null)
                     return;
-                    
+
                 int result = await localizacionRepository.AddLocalizacion(new Localizacion
                 {
                     Longitud = mensaje.location.longitude,
@@ -223,8 +226,9 @@ namespace ApiWhatsapp.Helpers
         /// <summary>
         /// Descarga un archivo multimedia desde los servidores de Meta (Facebook).
         /// </summary>
-        /// <param name="mediaId">ID del media en la API de Meta</param>
-        /// <returns>Ruta local del archivo guardado</returns>
+        /// <param name="mediaId">ID del media en la API de Meta.</param>
+        /// <param name="nombreArchivo">Nombre base para guardar el archivo localmente.</param>
+        /// <returns>Ruta local del archivo guardado.</returns>
         public async Task<string> DescargarArchivoDesdeMetaAsync(string mediaId, string nombreArchivo)
         {
             try
@@ -250,12 +254,9 @@ namespace ApiWhatsapp.Helpers
 
                 string extension = mimeType switch
                 {
-                    // Imágenes
                     "image/jpeg" => ".jpg",
                     "image/png" => ".png",
                     "image/webp" => ".webp",
-
-                    // Documentos
                     "application/pdf" => ".pdf",
                     "application/msword" => ".doc",
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => ".docx",
@@ -264,20 +265,14 @@ namespace ApiWhatsapp.Helpers
                     "application/vnd.ms-powerpoint" => ".ppt",
                     "application/vnd.openxmlformats-officedocument.presentationml.presentation" => ".pptx",
                     "text/plain" => ".txt",
-
-                    // Audio
                     "audio/aac" => ".aac",
                     "audio/mpeg" => ".mp3",
                     "audio/mp4" => ".mp4",
                     "audio/amr" => ".amr",
                     "audio/ogg" => ".ogg",
                     "audio/opus" => ".opus",
-
-                    // Video
                     "video/mp4" => ".mp4",
                     "video/3gpp" => ".3gp",
-
-                    // Valor por defecto
                     _ => ".bin"
                 };
 

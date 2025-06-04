@@ -17,9 +17,6 @@ namespace ApiWhatsapp.Controller
     {
         private TelefonoRepository telefonoRepository;
 
-        /// <summary>
-        /// Constructor del controlador de teléfonos.
-        /// </summary>
         public TelefonosController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper)
         {
             telefonoRepository = new TelefonoRepository(context, contextTerceros, mapper);

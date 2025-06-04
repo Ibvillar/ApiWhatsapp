@@ -14,10 +14,6 @@ namespace ApiWhatsapp.BBDD
     {
         private readonly DbWhatsapp context;
 
-        /// <summary>
-        /// Constructor del repositorio de mensajes.
-        /// </summary>
-        /// <param name="context">Contexto de la base de datos</param>
         public MensajeRepository(DbWhatsapp context)
         {
             this.context = context;
@@ -198,6 +194,13 @@ namespace ApiWhatsapp.BBDD
             return mensaje;
         }
 
+        /// <summary>
+        /// Construye un mensaje con un botón guardado asociado.
+        /// </summary>
+        /// <param name="numeroOrigen">Número de teléfono del remitente.</param>
+        /// <param name="numeroDestino">Número de teléfono del destinatario.</param>
+        /// <param name="idBoton">ID del botón asociado al mensaje.</param>
+        /// <returns>Un objeto Mensaje que contiene el botón asignado.</returns>
         public Mensaje ConstruirMensajeBotonGuardado(long numeroOrigen, long numeroDestino, int idBoton)
         {
             var mensaje = ConstruirMensaje(numeroOrigen, numeroDestino);

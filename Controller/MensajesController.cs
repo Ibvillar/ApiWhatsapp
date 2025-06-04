@@ -31,9 +31,6 @@ namespace ApiWhatsapp.Controller
         private readonly long NumeroEmpresa;
         private readonly IMapper mapper;
 
-        /// <summary>
-        /// Constructor del controlador de mensajes.
-        /// </summary>
         public MensajesController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion)
         {
             _httpClient = new HttpClient();
@@ -51,6 +48,7 @@ namespace ApiWhatsapp.Controller
         /// </summary>
         /// <param name="numeroDestino">Número del destinatario</param>
         /// <param name="texto">Texto del mensaje</param>
+        /// <returns>Resultado de la operación HTTP</returns>
         [HttpPost("enviar-texto")]
         public async Task<ActionResult> EnviarMensajeTexto(long numeroDestino, string texto)
         {
@@ -76,21 +74,19 @@ namespace ApiWhatsapp.Controller
         /// </summary>
         /// <param name="numeroDestino">Número del destinatario</param>
         /// <param name="file">Archivo de imagen a enviar</param>
+        /// <returns>Resultado de la operación HTTP</returns>
         [HttpPost("enviar-imagen")]
         public async Task<ActionResult> EnviarMensajeImagen(long numeroDestino, IFormFile file)
         {
             try
             {
-                // Subir archivo y obtener la ruta donde se guardó
                 string rutaArchivo = await _mensajesHelper.UploadFile(file);
                 if (string.IsNullOrEmpty(rutaArchivo))
                     return BadRequest("No se pudo guardar el archivo");
 
-                // Guardar referencia del archivo y el mensaje
                 int idFichero = await GuardarFichero(Path.GetFileName(rutaArchivo));
                 await GuardarMensaje(NumeroEmpresa, numeroDestino, "", idFichero);
 
-                // Construir y enviar el mensaje con imagen
                 var mensaje = await _mensajesHelper.ConstruirMensajeImagen(numeroDestino, rutaArchivo);
                 var json = CastToJson(mensaje);
 
@@ -109,24 +105,21 @@ namespace ApiWhatsapp.Controller
         /// </summary>
         /// <param name="numeroDestino">Número del destinatario</param>
         /// <param name="file">Archivo de documento a enviar</param>
+        /// <returns>Resultado de la operación HTTP</returns>
         [HttpPost("enviar-documento")]
         public async Task<ActionResult> EnviarMensajeDocumento(long numeroDestino, IFormFile file)
         {
             try
             {
-                // Subir archivo y obtener la ruta donde se guardó
                 string rutaArchivo = await _mensajesHelper.UploadFile(file);
                 if (string.IsNullOrEmpty(rutaArchivo))
                     return BadRequest("No se pudo guardar el archivo");
 
-                // Obtener nombre del documento para mostrar
                 string nombreDocumento = Path.GetFileName(rutaArchivo);
 
-                // Guardar referencia del archivo y el mensaje
                 int idFichero = await GuardarFichero(nombreDocumento);
                 await GuardarMensaje(NumeroEmpresa, numeroDestino, "", idFichero);
 
-                // Construir y enviar el mensaje con documento
                 var mensaje = await _mensajesHelper.ConstruirMensajeDocumento(numeroDestino, nombreDocumento, rutaArchivo);
                 var json = CastToJson(mensaje);
 
@@ -140,14 +133,13 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-
         /// <summary>
         /// Envía un mensaje con botones a un número de teléfono.
         /// </summary>
         /// <param name="cuerpo">Texto del mensaje.</param>
         /// <param name="numero">Número de destino.</param>
         /// <param name="idBoton">IDs de los botones a incluir (máx. 3).</param>
-        /// <returns>OK si se envió correctamente, BadRequest si hubo error.</returns>
+        /// <returns>Resultado de la operación HTTP</returns>
         [HttpPost("enviar-boton")]
         public async Task<ActionResult> EnviarMensajeBoton(string cuerpo, string numero, params int[] idBoton)
         {
@@ -188,6 +180,11 @@ namespace ApiWhatsapp.Controller
             return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
 
+        /// <summary>
+        /// Envía un mensaje de bienvenida a un nuevo usuario.
+        /// </summary>
+        /// <param name="mensaje">DTO con información del mensaje de bienvenida</param>
+        /// <returns>Resultado de la operación HTTP</returns>
         [HttpPost("mensaje-bienvenida")]
         public async Task<ActionResult> EnviarMensajeBienvenida(MensajeBienvenidaDTO mensaje)
         {
@@ -195,7 +192,6 @@ namespace ApiWhatsapp.Controller
             {
                 long Id = long.Parse(mensaje.Telefono.Prefijo.ToString() + mensaje.Telefono.Numero.ToString());
 
-                // Buscar teléfono existente
                 var telefonoDb = await telefonoRepository.GetTelefonosById(Id);
 
                 Telefono telefono;
@@ -241,6 +237,7 @@ namespace ApiWhatsapp.Controller
         /// Cambia el estado de un mensaje a leído.
         /// </summary>
         /// <param name="mensajeId">ID del mensaje</param>
+        /// <returns>Resultado de la operación HTTP</returns>
         [HttpPut("cambiar-a-leido/{mensajeId}")]
         public async Task<ActionResult> CambiarALeido(int mensajeId)
         {
@@ -259,6 +256,7 @@ namespace ApiWhatsapp.Controller
         /// <summary>
         /// Obtiene todos los mensajes registrados.
         /// </summary>
+        /// <returns>Lista de mensajes o NotFound si no hay mensajes</returns>
         [HttpGet("obtener-mensajes")]
         public async Task<ActionResult> GetAllMensajes()
         {
@@ -277,6 +275,7 @@ namespace ApiWhatsapp.Controller
         /// Obtiene los mensajes enviados por un número específico.
         /// </summary>
         /// <param name="telefonoId">ID del número de origen</param>
+        /// <returns>Lista de mensajes o NotFound si no existen</returns>
         [HttpGet("obtener-mensajes-origen/{telefonoId}")]
         public async Task<ActionResult> GetMensajesByOrigen(long telefonoId)
         {
@@ -295,6 +294,7 @@ namespace ApiWhatsapp.Controller
         /// Obtiene los mensajes recibidos por un número específico.
         /// </summary>
         /// <param name="telefonoId">ID del número de destino</param>
+        /// <returns>Lista de mensajes o NotFound si no existen</returns>
         [HttpGet("obtener-mensajes-destino/{telefonoId}")]
         public async Task<ActionResult> GetMensajesByDestino(long telefonoId)
         {
@@ -313,6 +313,7 @@ namespace ApiWhatsapp.Controller
         /// Obtiene un mensaje por su ID.
         /// </summary>
         /// <param name="mensajeId">ID del mensaje</param>
+        /// <returns>Mensaje solicitado o NotFound si no existe</returns>
         [HttpGet("obtener-mensaje/{mensajeId}")]
         public async Task<ActionResult> GetMensajeById(int mensajeId)
         {
@@ -327,7 +328,11 @@ namespace ApiWhatsapp.Controller
             }
         }
 
-
+        /// <summary>
+        /// Elimina un mensaje por su ID.
+        /// </summary>
+        /// <param name="mensajeId">ID del mensaje a eliminar</param>
+        /// <returns>Resultado de la operación HTTP</returns>
         [HttpDelete("eliminar-mensaje/{mensajeId}")]
         public async Task<ActionResult> RemoveMensaje(int mensajeId)
         {
@@ -349,6 +354,8 @@ namespace ApiWhatsapp.Controller
         /// <summary>
         /// Retorna la URL base del endpoint de la API de WhatsApp.
         /// </summary>
+        /// <param name="phonNumberId">ID del número telefónico (no usado actualmente)</param>
+        /// <returns>URL base como cadena</returns>
         private static string getUrl(string phonNumberId)
         {
             return "https://graph.facebook.com/v22.0/109348135405910/";
@@ -357,6 +364,8 @@ namespace ApiWhatsapp.Controller
         /// <summary>
         /// Serializa un objeto a formato JSON.
         /// </summary>
+        /// <param name="mensaje">Objeto a serializar</param>
+        /// <returns>Cadena JSON</returns>
         private string CastToJson(object mensaje)
         {
             return JsonSerializer.Serialize(mensaje);
@@ -387,6 +396,11 @@ namespace ApiWhatsapp.Controller
         /// <summary>
         /// Guarda un mensaje en la base de datos.
         /// </summary>
+        /// <param name="numeroOrigen">Número de origen</param>
+        /// <param name="numeroDestino">Número destino</param>
+        /// <param name="texto">Texto del mensaje</param>
+        /// <param name="idFichero">ID del fichero asociado, si aplica</param>
+        /// <returns>True si se guardó correctamente</returns>
         private async Task<bool> GuardarMensaje(long numeroOrigen, long numeroDestino, string texto, int idFichero)
         {
             if (telefonoRepository.GetTelefonosById(numeroDestino) is null)
@@ -404,6 +418,8 @@ namespace ApiWhatsapp.Controller
         /// <summary>
         /// Guarda un fichero en la base de datos (si no existe ya).
         /// </summary>
+        /// <param name="ruta">Ruta o nombre del fichero</param>
+        /// <returns>ID del fichero guardado o existente</returns>
         private async Task<int> GuardarFichero(string ruta)
         {
             try

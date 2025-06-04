@@ -206,6 +206,11 @@ namespace ApiWhatsapp.BBDD
             return result;
         }
 
+        /// <summary>
+        /// Valida si un teléfono existe en la base de datos; si no, lo crea y agrega.
+        /// </summary>
+        /// <param name="telefonoDTO">Objeto DTO que contiene los datos del teléfono a validar.</param>
+        /// <returns>Una tarea asincrónica.</returns>
         public async Task ValidateNumber(TelefonoDTO telefonoDTO)
         {
             try
@@ -214,8 +219,8 @@ namespace ApiWhatsapp.BBDD
 
                 if (await GetTelefonosById(id) is null)
                 {
-                   Telefono telefono = ConstruirTelefono(telefonoDTO.Numero, short.Parse(telefonoDTO.Prefijo.ToString()), telefonoDTO.Nombre);
-                   await AddTelefono(telefono);
+                    Telefono telefono = ConstruirTelefono(telefonoDTO.Numero, short.Parse(telefonoDTO.Prefijo.ToString()), telefonoDTO.Nombre);
+                    await AddTelefono(telefono);
                 }
             }
             catch (Exception e)
@@ -224,6 +229,13 @@ namespace ApiWhatsapp.BBDD
             }
         }
 
+        /// <summary>
+        /// Asocia un código específico a un teléfono existente.
+        /// </summary>
+        /// <param name="telefono">Objeto Telefono que se actualizará con el código.</param>
+        /// <param name="cod">Código que se asignará al teléfono.</param>
+        /// <returns>Devuelve true si la operación fue exitosa.</returns>
+        /// <exception cref="Exception">Lanza excepción si el teléfono no existe.</exception>
         public async Task<bool> AddCodigo(Telefono? telefono, string cod)
         {
             telefono = await context.Telefonos.Where(x => x.Id == telefono!.Id).FirstOrDefaultAsync();
@@ -239,6 +251,12 @@ namespace ApiWhatsapp.BBDD
             return true;
         }
 
+        /// <summary>
+        /// Actualiza el estado de ubicación de un teléfono.
+        /// </summary>
+        /// <param name="estado">Nuevo estado de la ubicación (true o false).</param>
+        /// <param name="Id">ID del teléfono a actualizar.</param>
+        /// <returns>Devuelve true si la actualización fue exitosa, false si el teléfono no existe.</returns>
         public async Task<bool> SetUbicacion(bool estado, long Id)
         {
             Telefono telefono = await GetTelefonosById(Id);
@@ -251,6 +269,12 @@ namespace ApiWhatsapp.BBDD
             return true;
         }
 
+        /// <summary>
+        /// Actualiza el token de un teléfono dado su ID.
+        /// </summary>
+        /// <param name="Id">ID del teléfono a actualizar.</param>
+        /// <param name="Token">Nuevo token que se asignará al teléfono.</param>
+        /// <returns>Devuelve true si la actualización fue exitosa, false si el teléfono no existe.</returns>
         public async Task<bool> UpdateToken(long Id, string Token)
         {
             Telefono? telefono = await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
@@ -262,5 +286,6 @@ namespace ApiWhatsapp.BBDD
             await context.SaveChangesAsync();
             return true;
         }
+
     }
 }

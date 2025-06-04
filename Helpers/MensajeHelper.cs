@@ -96,6 +96,11 @@ namespace ApiWhatsapp.EnvioMensajes
             };
         }
 
+        /// <summary>
+        /// Sube un archivo recibido y lo guarda en una carpeta local.
+        /// </summary>
+        /// <param name="file">Archivo a subir.</param>
+        /// <returns>Ruta completa donde se guardó el archivo, o null si el archivo es inválido.</returns>
         public async Task<string> UploadFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -116,8 +121,6 @@ namespace ApiWhatsapp.EnvioMensajes
 
             return filePath;
         }
-
-
 
         /// <summary>
         /// Sube un archivo al servidor de WhatsApp y obtiene el ID del media.

@@ -14,11 +14,6 @@ namespace ApiWhatsapp.Controller
     {
         private FicheroRepository ficheroRepository;
 
-        /// <summary>
-        /// Constructor del controlador FicherosController
-        /// </summary>
-        /// <param name="context">Contexto de la base de datos</param>
-        /// <param name="mapper">Instancia de AutoMapper</param>
         public FicherosController(DbWhatsapp context, IMapper mapper)
         {
             ficheroRepository = new FicheroRepository(context, mapper);
