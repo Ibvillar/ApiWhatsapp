@@ -17,10 +17,10 @@ namespace ApiWhatsapp.Helpers
 
         public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion) 
         {
-            _mensajeController = new MensajesController(context, contextTerceros, mapper, _configuracion);
-            _controller = new ControlPresenciaController(_configuracion, context);
-            _telefonosRepository = new TelefonoRepository(context, contextTerceros, mapper);
             _localizacionRepository = new LocalizacionRepository(context);
+            _mensajeController = new MensajesController(context, contextTerceros, mapper, _configuracion);
+            _controller = new ControlPresenciaController(_configuracion, _mensajeController, context, contextTerceros, mapper);
+            _telefonosRepository = new TelefonoRepository(context, contextTerceros, mapper);
         }
 
         public async Task ResponderMensaje(MessageWebhook mensaje)
@@ -29,17 +29,17 @@ namespace ApiWhatsapp.Helpers
 
             var codUsuario = await GetCodFromNumber(mensaje.from);
 
-            bool tieneUbicacion = await _localizacionRepository.UsuarioTieneLocalizacionValida(long.Parse(mensaje.from));
-
-            if (!tieneUbicacion)
-            {
-                await _mensajeController.EnviarMensajeTexto(long.Parse(mensaje.from), "📍 Por favor, comparte tu ubicación antes de registrar la jornada.");
-                return;
-            }
-
             switch (id)
             {
                 case 1:
+                    bool tieneUbicacion = await _localizacionRepository.UsuarioTieneLocalizacion(long.Parse(mensaje.from));
+
+                    if (!tieneUbicacion)
+                    {
+                        await EnviarMensajeLcalizacion(mensaje.from);
+                        return;
+                    }
+
                     await ProcesarAccion(id, await _controller.IniciarJornada(await GetCodFromNumber(mensaje.from)), mensaje.from);
                     break;
                 case 2:
@@ -54,6 +54,11 @@ namespace ApiWhatsapp.Helpers
                 default:
                     break;
             }
+        }
+
+        private async Task EnviarMensajeLcalizacion(string telefono)
+        {
+            await _mensajeController.EnviarMensajeBoton("📍 Por favor, comparte tu ubicación antes de registrar la jornada.", telefono, 1);
         }
 
         private async Task ProcesarAccion(int idAccion, string error, string numero)

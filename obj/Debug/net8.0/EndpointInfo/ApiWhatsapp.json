@@ -800,9 +800,13 @@
       },
       "Telefono": {
         "required": [
+          "idGenerales",
+          "idTerceros",
           "nombre",
           "numero",
-          "prefijo"
+          "prefijo",
+          "token",
+          "ubicacion"
         ],
         "type": "object",
         "properties": {
@@ -827,12 +831,15 @@
             "format": "int32"
           },
           "idGenerales": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "token": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
+          },
+          "ubicacion": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

@@ -18,8 +18,8 @@ namespace ApiWhatsapp.Entities
         [Column("LATITUD")]
         public double Latitud { get; set; }
 
-        [Column("ULTIMA_ACTUALIZACION")]
-        public DateTime UltimaActualizacion {  get; set; }
+        [Column("DIA")]
+        public DateOnly Dia {  get; set; }
 
         [Required]
         [Column("ID_TELEFONO")]

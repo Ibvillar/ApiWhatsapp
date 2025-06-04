@@ -3,6 +3,7 @@ using System.Text.Json;
 using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,11 +20,11 @@ namespace ApiWhatsapp.Controller
         private DbWhatsapp _context;
 
 
-        public ControlPresenciaController(IConfiguration _configuration, DbWhatsapp _context)
+        public ControlPresenciaController(IConfiguration _configuration, MensajesController mensajes, DbWhatsapp _context, DbTerceros terceros, IMapper mapper)
         {
             _httpClient = new HttpClient();
             URL = _configuration["RutaControlPresencia"]!;
-            Cod = String.Empty;
+            Cod = "";
             this._context = _context;
         }
 
@@ -32,6 +33,7 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
+                Console.WriteLine(cod);
                 var token = await ObtenerToken(cod);
 
                 var url = URL + "reloj/empezar-jornada/" + Cod;

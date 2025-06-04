@@ -82,7 +82,7 @@ namespace ApiWhatsapp.Helpers
                     break;
 
                 case "location":
-                    await ActualizarLocalizacion(mensaje);
+                    await GuardarLocalizacion(mensaje);
                     break;
 
                 default:
@@ -99,13 +99,9 @@ namespace ApiWhatsapp.Helpers
             string rutaArchivo = "";
 
             if (mensaje.image is not null)
-            {
                 rutaArchivo = await DescargarArchivoDesdeMetaAsync(mensaje.image.id, mensaje.image.id);
-            }
             else if (mensaje.document is not null)
-            {
                 rutaArchivo = await DescargarArchivoDesdeMetaAsync(mensaje.document.id, mensaje.document.filename);
-            }
 
             try
             {
@@ -165,9 +161,7 @@ namespace ApiWhatsapp.Helpers
                 var numero = DetectarPrefijo(long.Parse(webhook.from));
 
                 if (!numero.HasValue)
-                {
                     throw new Exception("El número no es válido.");
-                }
 
                 telefono = telefonoRepository.ConstruirTelefono(
                     numero.Value.numeroSinPrefijo, numero.Value.prefijo, numero1);
@@ -201,18 +195,24 @@ namespace ApiWhatsapp.Helpers
             return null;
         }
 
-        private async Task ActualizarLocalizacion(MessageWebhook mensaje)
+        private async Task GuardarLocalizacion(MessageWebhook mensaje)
         {
             Console.WriteLine($"Longitud: {mensaje.location.longitude}, Latitud: {mensaje.location.latitude}");
             try
             {
-                Localizacion localizacion = await localizacionRepository.GetLocalizacionByPosicion(mensaje.location.longitude,
-                    mensaje.location.latitude, long.Parse(mensaje.from));
+                Localizacion? localizacion = await localizacionRepository.GetLocalizacionByDia(
+                    DateOnly.FromDateTime(DateTime.UtcNow), long.Parse(mensaje.from));
 
-                if (localizacion is null)
+                if (localizacion is not null)
                     return;
-
-                await localizacionRepository.ActualizarTiempo(localizacion.Id);
+                    
+                int result = await localizacionRepository.AddLocalizacion(new Localizacion
+                {
+                    Longitud = mensaje.location.longitude,
+                    Latitud = mensaje.location.latitude,
+                    Dia = DateOnly.FromDateTime(DateTime.UtcNow),
+                    IdTelefono = long.Parse(mensaje.from)
+                });
             }
             catch (Exception ex)
             {

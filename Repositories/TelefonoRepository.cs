@@ -109,7 +109,6 @@ namespace ApiWhatsapp.BBDD
             }
             catch (Exception ex)
             {
-                Console.WriteLine("11111111111111111111");
                 Console.WriteLine(ex.ToString());
                 return telefonos!;
             }

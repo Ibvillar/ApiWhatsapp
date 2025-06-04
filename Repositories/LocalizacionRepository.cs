@@ -16,34 +16,21 @@ namespace ApiWhatsapp.Repositories
 
         public async Task<int> AddLocalizacion(Localizacion localizacion)
         {
-            if (GetLocalizacionByPosicion(localizacion.Longitud, localizacion.Latitud, localizacion.IdTelefono) is not null)
-                return 0;
-
             await context.AddAsync(localizacion);
+            await context.SaveChangesAsync();
 
             return (GetLocalizacionById(localizacion.Id, localizacion.IdTelefono) == null) ? 1: -1;
         }
 
-        public async Task<bool> UsuarioTieneLocalizacionValida(long telefonoId)
+        public async Task<bool> UsuarioTieneLocalizacion(long telefonoId)
         {
-            var haceCuatroMinutos = DateTime.UtcNow.AddMinutes(-4);
+            var ahora = DateOnly.FromDateTime(DateTime.UtcNow);
 
             var localizacionReciente = await context.Localizaciones
-                .Where(x => x.IdTelefono == telefonoId && x.UltimaActualizacion > haceCuatroMinutos)
+                .Where(x => x.IdTelefono == telefonoId && x.Dia == ahora)
                 .FirstOrDefaultAsync();
 
             return localizacionReciente != null;
-        }
-
-        public async Task<bool> ActualizarTiempo(int Id)
-        {
-            Localizacion? localizacion = await context.Localizaciones.FirstOrDefaultAsync(x => x.Id == Id);
-
-            localizacion!.UltimaActualizacion = DateTime.UtcNow;
-
-            int result = await context.SaveChangesAsync();
-
-            return result != 0;
         }
 
         public async Task<Localizacion?> GetLocalizacionByPosicion(double longitud, double latitud, long telefonoId)
@@ -55,6 +42,12 @@ namespace ApiWhatsapp.Repositories
         public async Task<Localizacion?> GetLocalizacionById(int Id, long telefonoId)
         {
             return await context.Localizaciones.FirstOrDefaultAsync(x => x.Id == Id);
+        }
+
+        public async Task<Localizacion?> GetLocalizacionByDia(DateOnly date, long telefonoId)
+        {
+            return await context.Localizaciones.Where(x =>
+            x.Dia == date && x.IdTelefono == telefonoId).FirstOrDefaultAsync();
         }
     }
 }

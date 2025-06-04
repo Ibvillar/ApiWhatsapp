@@ -45,9 +45,6 @@ namespace ApiWhatsapp.Controller
             var reader = new StreamReader(Request.Body);
             var body = await reader.ReadToEndAsync();
 
-            Console.WriteLine("Webhook recibido: ");
-            Console.WriteLine(body);
-
             try
             {
                 var payload = JsonConvert.DeserializeObject<WebhookPayload>(body);
