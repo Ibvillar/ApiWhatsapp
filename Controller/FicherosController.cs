@@ -69,16 +69,16 @@ namespace ApiWhatsapp.Controller
 
                 if (ficheros.IsNullOrEmpty())
                 {
-                    return BadRequest("No hay ficheros disponibles");
+                    return NotFound("No hay ficheros disponibles");
                 }
 
                 // Normaliza las rutas para usabilidad
                 foreach (var fichero in ficheros)
                 {
-                    fichero.Ruta = fichero.Ruta.Replace('\\', '/');
+                    fichero.Ruta = _configuration["RutaFicheros"]! + fichero.Ruta.Replace('\\', '/');
                 }
 
-                return Ok(_configuration["RutaFicheros"]! + ficheros);
+                return Ok(ficheros);
             }
             catch (Exception e)
             {

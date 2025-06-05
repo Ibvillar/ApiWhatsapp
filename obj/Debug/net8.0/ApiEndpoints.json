@@ -358,7 +358,7 @@
   },
   {
     "ContainingType": "ApiWhatsapp.Controller.TelefonosController",
-    "Method": "CrearTeleofno",
+    "Method": "CrearTelefono",
     "RelativePath": "telefono/agregar-telefono",
     "HttpMethod": "POST",
     "IsController": true,

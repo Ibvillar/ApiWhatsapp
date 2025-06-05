@@ -35,6 +35,7 @@ namespace ApiWhatsapp.BBDD
         /// <returns>True si se ha insertado correctamente, False en caso contrario</returns>
         public async Task<bool> AddTelefono(Telefono telefono)
         {
+            Console.WriteLine("1111111111111");
             try
             {
                 TercerosDTO tercerosDTO = await GetTelefonoIdTerceros(telefono.Numero);
@@ -119,9 +120,18 @@ namespace ApiWhatsapp.BBDD
         /// </summary>
         /// <param name="Id">ID del teléfono</param>
         /// <returns>Objeto Teléfono si se encuentra, null en caso contrario</returns>
-        public async Task<Telefono> GetTelefonosById(long Id)
+        public async Task<Telefono?> GetTelefonosById(long Id)
         {
-            return await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
+            try
+            {
+                return await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+            
         }
 
         /// <summary>

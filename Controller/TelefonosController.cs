@@ -28,7 +28,7 @@ namespace ApiWhatsapp.Controller
         /// <param name="telefonoDTO">Objeto DTO con los datos del teléfono.</param>
         /// <returns>Resultado de la operación.</returns>
         [HttpPost("agregar-telefono")]
-        public async Task<ActionResult> CrearTeleofno(TelefonoDTO telefonoDTO)
+        public async Task<ActionResult> CrearTelefono(TelefonoDTO telefonoDTO)
         {
             try
             {
@@ -38,10 +38,11 @@ namespace ApiWhatsapp.Controller
                     return BadRequest(mensaje);
                 }
 
+
                 Telefono telefono = telefonoRepository.ConstruirTelefono(
                                         telefonoDTO.Numero, telefonoDTO.Prefijo, telefonoDTO.Nombre);
 
-                if (telefonoRepository.GetTelefonosById(telefono.Id) is not null)
+                if (await telefonoRepository.GetTelefonosById(telefono.Id) is not null)
                 {
                     return BadRequest("Este teléfono ya existe");
                 }
