@@ -25,7 +25,7 @@ namespace ApiWhatsapp.EnvioMensajes
             _httpClient = new HttpClient();
             this._token = _token;
             this.url = url;
-            ruta = _configuracion["RutaFicheros"]!;
+            ruta = _configuracion["RutaFicherosLocal"]!;
         }
 
         /// <summary>

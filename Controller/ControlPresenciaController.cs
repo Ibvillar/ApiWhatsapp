@@ -22,14 +22,6 @@ namespace ApiWhatsapp.Controller
         private TokenValidationDTO _tokenActual;
         private DbWhatsapp _context;
 
-        /// <summary>
-        /// Constructor del controlador de control de presencia.
-        /// </summary>
-        /// <param name="_configuration">Configuración de la aplicación.</param>
-        /// <param name="mensajes">Instancia del controlador de mensajes.</param>
-        /// <param name="_context">Contexto de la base de datos principal.</param>
-        /// <param name="terceros">Contexto de base de datos de terceros.</param>
-        /// <param name="mapper">Instancia de AutoMapper.</param>
         public ControlPresenciaController(IConfiguration _configuration, MensajesController mensajes, DbWhatsapp _context, DbTerceros terceros, IMapper mapper)
         {
             _httpClient = new HttpClient();
@@ -39,7 +31,7 @@ namespace ApiWhatsapp.Controller
         }
 
         /// <summary>
-        /// Inicia la jornada laboral para un usuario dado su código.
+        /// Inicia la jornada de un usuario a través de su código.
         /// </summary>
         /// <param name="cod">Código del usuario.</param>
         /// <returns>Mensaje con el resultado de la operación.</returns>
@@ -69,7 +61,7 @@ namespace ApiWhatsapp.Controller
         }
 
         /// <summary>
-        /// Reanuda una jornada previamente pausada.
+        /// Reanuda la jornada. Tiene que estar pausada primero.
         /// </summary>
         /// <param name="cod">Código del usuario.</param>
         /// <returns>Mensaje con el resultado de la operación.</returns>
@@ -95,7 +87,7 @@ namespace ApiWhatsapp.Controller
         }
 
         /// <summary>
-        /// Pausa la jornada actual del usuario.
+        /// Pausa la jornada actual del usuario. Tiene que estar iniciada primero
         /// </summary>
         /// <param name="cod">Código del usuario.</param>
         /// <returns>Mensaje con el resultado de la operación.</returns>
@@ -123,7 +115,7 @@ namespace ApiWhatsapp.Controller
         }
 
         /// <summary>
-        /// Finaliza la jornada laboral del usuario.
+        /// Finaliza la jornada laboral del usuario. Primero tiene que estar iniciada
         /// </summary>
         /// <param name="cod">Código del usuario.</param>
         /// <returns>Mensaje con el resultado de la operación.</returns>
@@ -175,14 +167,14 @@ namespace ApiWhatsapp.Controller
         }
 
         /// <summary>
-        /// Obtiene un token de autenticación válido para el usuario.
+        /// Renueva el token del usuario y lo devuelve.
         /// </summary>
         /// <param name="cod">Código del usuario.</param>
         /// <returns>Objeto <see cref="TokenValidationDTO"/> con el token actualizado.</returns>
         private async Task<TokenValidationDTO> ObtenerToken(string cod)
         {
             Telefono? telefono = await _context.Telefonos.FirstOrDefaultAsync(x => x.IdGenerales == cod);
-            if (telefono == null) return null;
+            if (telefono == null) return null!;
 
             var url = $"{URL}usuario/obtener-token?userCod={Uri.EscapeDataString(cod)}&tokenValidation={Uri.EscapeDataString(telefono.Token)}";
 

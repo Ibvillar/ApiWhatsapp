@@ -36,7 +36,7 @@ namespace ApiWhatsapp.Helpers
             ficheroRepository = new FicheroRepository(context, mapper);
             _httpClient = new HttpClient();
             _configuration = configuration;
-            ruta = _configuration["RutaFicheros"]!;
+            ruta = _configuration["RutaFicherosLocal"]!;
             botonesHelper = new BotonesHelper(context, contextTerceros, mapper, configuration);
             localizacionRepository = new LocalizacionRepository(context);
         }

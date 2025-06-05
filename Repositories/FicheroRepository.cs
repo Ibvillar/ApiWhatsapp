@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using ApiWhatsapp.Data;
+﻿using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
@@ -40,7 +39,7 @@ namespace ApiWhatsapp.BBDD
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.ToString());
                 return false;
             }
         }
@@ -143,7 +142,6 @@ namespace ApiWhatsapp.BBDD
 
             if (fichero1 is null)
             {
-                Console.WriteLine("11111111111111111111111111");
                 return false;
             }
             

@@ -56,7 +56,7 @@ namespace ApiWhatsapp.Controller
         }
 
         /// <summary>
-        /// Obtiene la lista de todos los ficheros almacenados
+        /// Obtiene la lista de todos los ficheros almacenados con la ruta completa
         /// </summary>
         /// <returns>Lista de objetos Fichero, o BadRequest si no hay ficheros</returns>
         [HttpGet("obtener-ficheros")]
@@ -72,10 +72,12 @@ namespace ApiWhatsapp.Controller
                     return NotFound("No hay ficheros disponibles");
                 }
 
+                string mainRoot = _configuration["RutaFicherosWeb"]!.Replace('\\', '/');
+
                 // Normaliza las rutas para usabilidad
                 foreach (var fichero in ficheros)
                 {
-                    fichero.Ruta = _configuration["RutaFicheros"]! + fichero.Ruta.Replace('\\', '/');
+                    fichero.Ruta = mainRoot + fichero.Ruta;
                 }
 
                 return Ok(ficheros);
