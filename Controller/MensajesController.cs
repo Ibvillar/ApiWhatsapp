@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using ApiWhatsapp.EnvioMensajes;
 using System.Text;
-using System.Text.Json;
 using ApiWhatsapp.BBDD;
 using ApiWhatsapp.Data;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
 using ApiWhatsapp.DTO;
 using Microsoft.IdentityModel.Tokens;
-using ApiWhatsapp.Repositories;
 using ApiWhatsapp.Entities;
+using ApiWhatsapp.Helpers;
+using Newtonsoft.Json;
 
 namespace ApiWhatsapp.Controller
 {
@@ -30,6 +30,7 @@ namespace ApiWhatsapp.Controller
         private BotonRepository botonRepository;
         private readonly long NumeroEmpresa;
         private readonly IMapper mapper;
+        private readonly IConfiguration _configuracion;
 
         public MensajesController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion)
         {
@@ -41,6 +42,7 @@ namespace ApiWhatsapp.Controller
             botonRepository = new BotonRepository(context);
             NumeroEmpresa = long.Parse(_configuracion["NumeroEmpresa"]!);
             this.mapper = mapper;
+            this._configuracion = _configuracion;
         }
 
         /// <summary>
@@ -65,6 +67,8 @@ namespace ApiWhatsapp.Controller
             var json = CastToJson(mensaje);
 
             var respuesta = await EnviarMensaje(json);
+
+            Console.WriteLine(json.ToString());
 
             return respuesta ? Ok() : BadRequest("Algo salió mal al enviar el mensaje");
         }
@@ -148,7 +152,7 @@ namespace ApiWhatsapp.Controller
 
             List<DTO.ButtonReply> botones = new List<DTO.ButtonReply>();
 
-            foreach (var id in idBoton.Take(3))
+            foreach (var id in idBoton)
             {
                 Boton boton = await botonRepository.GetBotonById(id);
                 if (boton == null)
@@ -213,17 +217,42 @@ namespace ApiWhatsapp.Controller
                 await telefonoRepository.AddCodigo(telefono, mensaje.Telefono.IdGenerales);
                 await telefonoRepository.SetUbicacion(mensaje.ubicacion, telefonoId);
 
-                string cuerpo = $"👋 Bienvenido/a {telefono.Nombre}. Estamos encantados de tenerte con nosotros. 🎉\r\n\r\nAquí podrás gestionar tus jornadas laborales, pausar o reanudar tu actividad, y mantener todo bajo control.\r\n\r\nSi necesitas ayuda, escríbenos cuando quieras. 💬\r\n\r\n📌 *Tu cuenta ya está activa* y lista para usarse.\r\n\r\n¡Vamos a comenzar! 🚀";
+                var mensaje1 = new JsonMensajeBienvenida
+                {
+                    to = telefonoId.ToString(),
+                    template = new Template
+                    {
+                        name = "mensaje_bienvenida",
+                        language = new Language { code = "es" },
+                        components =
+                        [
+                            new Component
+                            {
+                                type = "body",
+                                parameters =
+                                [
+                                    new Parameter { type = "text", text = telefono.Nombre }
+                                ]
+                            }, 
+                            new Component
+                            {
+                                type = "button",
+                                sub_type = "url",
+                                index = "0",
+                                parameters = []
+                            }
+                        ]
+                    }
+                };
 
-                ActionResult result = await EnviarMensajeTexto(telefono.Id, cuerpo);
+                var json = JsonConvert.SerializeObject(mensaje1, Formatting.Indented);
+                bool enviado = await EnviarMensaje(json);
 
-                if (result is not OkResult)
+                Console.WriteLine(json.ToString());
+
+                if (!enviado) 
                     return BadRequest("No se ha podido mandar el mensaje de bienvenida correctamente");
-
-                result = await EnviarMensajeBoton("🎉 ¡Qué emoción! Esta es tu primera jornada con nosotros.\n\nDale al botón y comencemos con toda la energía 💪", telefono.Id.ToString(), 1);
-
-                if (result is not OkResult)
-                    return BadRequest("Error al intentar mandar el mensaje de inicio de jornada");
+                    
 
                 return Ok();
             }
@@ -368,7 +397,7 @@ namespace ApiWhatsapp.Controller
         /// <returns>Cadena JSON</returns>
         private string CastToJson(object mensaje)
         {
-            return JsonSerializer.Serialize(mensaje);
+            return System.Text.Json.JsonSerializer.Serialize(mensaje);
         }
 
         /// <summary>
@@ -376,7 +405,8 @@ namespace ApiWhatsapp.Controller
         /// </summary>
         /// <param name="json">Mensaje en formato JSON</param>
         /// <returns>True si se envió con éxito, False si falló</returns>
-        private async Task<bool> EnviarMensaje(string json)
+        [NonAction]
+        public async Task<bool> EnviarMensaje(string json)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TOKEN);
 
@@ -424,6 +454,10 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
+                string nuevaRuta = _configuracion["RutaFicherosLocal"]! + ruta;
+
+                FicherosHelper.CopiarArchivo(ruta, nuevaRuta);
+
                 var fichero = ficheroRepository.ConstuirFichero(new FicheroDTO { Ruta = ruta });
 
                 if (await ficheroRepository.ExisteFichero(fichero))

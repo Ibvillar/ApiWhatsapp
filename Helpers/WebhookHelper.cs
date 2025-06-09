@@ -74,6 +74,10 @@ namespace ApiWhatsapp.Helpers
                     await botonesHelper.ResponderMensaje(mensaje);
                     break;
 
+                case "button":
+                    //await
+                    break;
+
                 case "location":
                     await GuardarLocalizacion(mensaje);
                     break;

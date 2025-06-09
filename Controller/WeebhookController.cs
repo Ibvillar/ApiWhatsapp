@@ -44,6 +44,7 @@ namespace ApiWhatsapp.Controller
         {
             var reader = new StreamReader(Request.Body);
             var body = await reader.ReadToEndAsync();
+            Console.WriteLine(body.ToString());
 
             try
             {

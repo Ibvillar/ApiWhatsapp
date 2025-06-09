@@ -1,10 +1,12 @@
 ﻿using ApiWhatsapp.BBDD;
 using ApiWhatsapp.Controller;
 using ApiWhatsapp.Data;
+using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entities;
 using ApiWhatsapp.Entitties;
 using ApiWhatsapp.Repositories;
 using AutoMapper;
+using Newtonsoft.Json;
 
 namespace ApiWhatsapp.Helpers
 {
@@ -79,75 +81,91 @@ namespace ApiWhatsapp.Helpers
         /// <param name="numero">Número de teléfono del usuario.</param>
         private async Task ProcesarAccion(int idAccion, string error, string numero)
         {
-            var texto = ConstruirCuerpo(idAccion, error);
-            var botonesSiguientes = ObtenerBotonesSiguientes(idAccion, error);
-
-            await _mensajeController.EnviarMensajeBoton(texto, numero, botonesSiguientes);
+            if (isError(error))
+                await enviarMensaje(error, numero, "error_control_presencia");
+            else
+                switch (idAccion) {
+                    case 1:
+                        await enviarMensaje("iniciado", numero, "succes_control_presencia");
+                        break;
+                    case 2:
+                        await enviarMensaje("pausado", numero, "succes_control_presencia");
+                        break;
+                    case 3:
+                        await enviarMensaje("reaunudado", numero, "succes_control_presencia");
+                        break;
+                    case 4:
+                        await enviarMensaje("finalizado", numero, "succes_control_presencia");
+                        break;
+                } 
         }
 
-        /// <summary>
-        /// Construye el cuerpo del mensaje de respuesta en base al resultado de la acción.
-        /// </summary>
-        /// <param name="id">Identificador de la acción realizada.</param>
-        /// <param name="result">Resultado o mensaje de error.</param>
-        /// <returns>Mensaje personalizado para enviar al usuario.</returns>
-        private string ConstruirCuerpo(int id, string result)
+        private async Task enviarMensaje(string texto, string numero, string nombrePlantilla)
         {
-            bool fallo = !isError(result);
-            string horaActual = DateTime.Now.ToString("HH:mm");
-
-            return id switch
-            {
-                1 => fallo
-                    ? $"✅ Jornada iniciada con éxito.\n\n🕒 *Hora actual:* {horaActual}\n\n¡Buen trabajo! 🫡"
-                    : $"❌ *No se pudo iniciar la jornada*\n\n🕒 *Hora actual:* {horaActual}\n🔁 Por favor, inténtalo de nuevo.\n\n🛠️ Detalle del error: {result}",
-
-                2 => fallo
-                    ? $"⏸️ Jornada pausada correctamente.\n\n🕒 *Hora actual:* {horaActual}\n⏱️ *Tiempo trabajado:* {result}\n\n¡Tómate un respiro! ☕"
-                    : $"❌ *No se pudo pausar la jornada.*\n\n🕒 *Hora actual:* {horaActual}\n🔁 Intenta nuevamente.\n\n🛠️ Detalle del error: {result}",
-
-                3 => fallo
-                    ? $"▶️ Jornada reanudada con éxito.\n\n🕒 *Hora actual:* {horaActual}\n\n¡Seguimos! 🚀"
-                    : $"❌ *No se pudo reanudar la jornada.*\n\n🕒 *Hora actual:* {horaActual}\n🔁 Por favor, vuelve a intentarlo.\n\n🛠️ Detalle del error: {result}",
-
-                4 => fallo
-                    ? $"✅ Jornada finalizada correctamente.\n\n🕒 *Hora actual:* {horaActual}\n⏱️ *Tiempo total trabajado:* {result}\n\n¡Buen trabajo hoy! 🎉"
-                    : $"❌ *No se pudo finalizar la jornada.*\n\n🕒 *Hora actual:* {horaActual}\n🔁 Intenta de nuevo más tarde.\n\n🛠️ Detalle del error: {result}",
-
-                _ => $"⚠️ *Ha ocurrido un error inesperado.*\n\n🕒 *Hora actual:* {horaActual}\n🔧 Por favor, intenta nuevamente o contacta al soporte si el problema persiste."
-            };
-        }
-
-        /// <summary>
-        /// Obtiene los botones interactivos siguientes que se deben mostrar al usuario.
-        /// </summary>
-        /// <param name="idAccion">Acción actual realizada.</param>
-        /// <param name="error">Resultado de la acción.</param>
-        /// <returns>Arreglo de enteros que representan los botones siguientes disponibles.</returns>
-        private int[] ObtenerBotonesSiguientes(int idAccion, string error)
-        {
-            bool fallo = isError(error);
-
-            if (fallo)
-            {
-                return idAccion switch
+            await _mensajeController.EnviarMensaje(
+                JsonConvert.SerializeObject(new JsonMensajeBienvenida
                 {
-                    1 => [1, 2, 3],
-                    2 => [1, 2, 3],
-                    3 => [1, 3, 4],
-                    4 => [1, 3, 4],
-                    _ => []
-                };
-            }
-
-            return idAccion switch
-            {
-                1 => [2, 4],
-                2 => [3, 4],
-                3 => [2, 4],
-                4 => [1],
-                _ => []
-            };
+                    to = numero.ToString(),
+                    template = new Template
+                    {
+                        name = nombrePlantilla,
+                        language = new Language { code = "es" },
+                        components =
+                        [
+                            new Component
+                            {
+                                type = "body",
+                                parameters =
+                                [
+                                    new Parameter { type = "text", text = texto },
+                                    new Parameter { type = "text", text = DateTime.Now.ToString("HH:mm")}
+                                ]
+                            },
+                            new Component
+                            {
+                                type = "button",
+                                sub_type = "quick_reply",
+                                index = "0",
+                                parameters = new List<Parameter>
+                                {
+                                    new Parameter { type = "payload", payload = "iniciar_jornada" }
+                                }
+                            },
+                            new Component
+                            {
+                                type = "button",
+                                sub_type = "quick_reply",
+                                index = "1",
+                                parameters = new List<Parameter>
+                                {
+                                    new Parameter { type = "payload", payload = "pausar_jornada" }
+                                }
+                            },
+                            new Component
+                            {
+                                type = "button",
+                                sub_type = "quick_reply",
+                                index = "2",
+                                parameters = new List<Parameter>
+                                {
+                                    new Parameter { type = "payload", payload = "reaunudar_jornada" }
+                                }
+                            },
+                            new Component
+                            {
+                                type = "button",
+                                sub_type = "quick_reply",
+                                index = "3",
+                                parameters = new List<Parameter>
+                                {
+                                    new Parameter { type = "payload", payload = "finalizar_jornada" }
+                                }
+                            },
+                        ]
+                    }
+                },
+                Formatting.Indented
+             ));
         }
 
         /// <summary>

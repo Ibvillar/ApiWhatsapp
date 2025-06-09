@@ -1,12 +1,20 @@
 {
   "Version": 1,
-  "Hash": "EL8HAaMBg6rgVsS/KgvCSztaXIefCuTLwihTrb+/n4g=",
+  "Hash": "p1d9RNFaCR4bwd71onxWi7FtIT1iVRcirperU62NxmQ=",
   "Source": "ApiWhatsapp",
   "BasePath": "_content/ApiWhatsapp",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "ApiWhatsapp\\wwwroot",
+      "Source": "ApiWhatsapp",
+      "ContentRoot": "C:\\Proyectos\\ApiWhatsapp\\wwwroot\\",
+      "BasePath": "_content/ApiWhatsapp",
+      "Pattern": "**"
+    }
+  ],
   "Assets": [],
   "Endpoints": []
 }

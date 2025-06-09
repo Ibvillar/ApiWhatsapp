@@ -35,7 +35,6 @@ namespace ApiWhatsapp.BBDD
         /// <returns>True si se ha insertado correctamente, False en caso contrario</returns>
         public async Task<bool> AddTelefono(Telefono telefono)
         {
-            Console.WriteLine("1111111111111");
             try
             {
                 TercerosDTO tercerosDTO = await GetTelefonoIdTerceros(telefono.Numero);
