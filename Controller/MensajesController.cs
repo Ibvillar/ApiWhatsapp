@@ -223,7 +223,7 @@ namespace ApiWhatsapp.Controller
                     template = new Template
                     {
                         name = "mensaje_bienvenida",
-                        language = new Language { code = "es_ES" },
+                        language = new Language { code = "es" },
                         components =
                         [
                             new Component
@@ -233,14 +233,17 @@ namespace ApiWhatsapp.Controller
                                 [
                                     new Parameter { type = "text", text = telefono.Nombre }
                                 ]
-                            }, 
+                            },
                             new Component
                             {
                                 type = "button",
-                                sub_type = "url",
+                                sub_type = "quick_reply",
                                 index = "0",
-                                parameters = []
-                            }
+                                parameters = new List<Parameter>
+                                {
+                                    new Parameter { type = "payload", payload = "iniciar_jornada" }
+                                }
+                            },
                         ]
                     }
                 };

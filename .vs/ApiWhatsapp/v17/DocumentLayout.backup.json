@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Proyectos\\ApiWhatsapp\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\helpers\\webhookhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:helpers\\webhookhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\controller\\mensajescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:controller\\mensajescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\helpers\\botoneshelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:helpers\\botoneshelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|c:\\proyectos\\apiwhatsapp\\helpers\\webhookhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14498E3F-79CF-4DB9-99F8-1EFE25E9C660}|ApiWhatsapp.csproj|solutionrelative:helpers\\webhookhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,6 +27,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "MensajesController.cs",
+              "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Controller\\MensajesController.cs",
+              "RelativeDocumentMoniker": "Controller\\MensajesController.cs",
+              "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Controller\\MensajesController.cs",
+              "RelativeToolTip": "Controller\\MensajesController.cs",
+              "ViewState": "AgIAANYAAAAAAAAAAAAnwOAAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-10T08:38:06.299Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "WebhookHelper.cs",
               "DocumentMoniker": "C:\\Proyectos\\ApiWhatsapp\\Helpers\\WebhookHelper.cs",
               "RelativeDocumentMoniker": "Helpers\\WebhookHelper.cs",
@@ -41,7 +58,7 @@
               "RelativeDocumentMoniker": "Helpers\\BotonesHelper.cs",
               "ToolTip": "C:\\Proyectos\\ApiWhatsapp\\Helpers\\BotonesHelper.cs",
               "RelativeToolTip": "Helpers\\BotonesHelper.cs",
-              "ViewState": "AgIAAIkAAAAAAAAAAAAnwKQAAABKAAAAAAAAAA==",
+              "ViewState": "AgIAAH0AAAAAAAAAAAAnwIYAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-10T08:22:32.245Z",
               "EditorCaption": ""
