@@ -44,7 +44,7 @@ namespace ApiWhatsapp.Helpers
 
                     if (!tieneUbicacion)
                     {
-                        await EnviarMensajeLcalizacion(mensaje.from);
+                        await enviarMensajeLocalizacion(mensaje.from);
                         return;
                     }
 
@@ -62,15 +62,6 @@ namespace ApiWhatsapp.Helpers
                 default:
                     break;
             }
-        }
-
-        /// <summary>
-        /// Envía un mensaje solicitando la ubicación al usuario.
-        /// </summary>
-        /// <param name="telefono">Número de teléfono del usuario.</param>
-        private async Task EnviarMensajeLcalizacion(string telefono)
-        {
-            await _mensajeController.EnviarMensajeBoton("📍 Por favor, comparte tu ubicación antes de registrar la jornada.", telefono, 1);
         }
 
         /// <summary>
@@ -169,13 +160,46 @@ namespace ApiWhatsapp.Helpers
         }
 
         /// <summary>
+        /// Envía un mensaje solicitando la ubicación al usuario.
+        /// </summary>
+        /// <param name="telefono">Número de teléfono del usuario.</param>
+        private async Task enviarMensajeLocalizacion(string numero)
+        {
+            await _mensajeController.EnviarMensaje(
+                JsonConvert.SerializeObject(new JsonMensajeBienvenida
+                {
+                    to = numero.ToString(),
+                    template = new Template
+                    {
+                        name = "soliciar_localizacion",
+                        language = new Language { code = "es" },
+                        components =
+                        [
+                            new Component
+                            {
+                                type = "button",
+                                sub_type = "quick_reply",
+                                index = "0",
+                                parameters = new List<Parameter>
+                                {
+                                    new Parameter { type = "payload", payload = "iniciar_jornada" }
+                                }
+                            }
+                        ]
+                    }
+                },
+                Formatting.Indented
+             ));
+        }
+
+        /// <summary>
         /// Extrae el ID del botón presionado a partir del mensaje recibido.
         /// </summary>
         /// <param name="mensaje">Mensaje del webhook.</param>
         /// <returns>ID del botón presionado como entero.</returns>
         private int GetId(MessageWebhook mensaje)
         {
-            return int.Parse(mensaje.interactive.button_reply.id);
+            return BotonRepository.GetBotonId(mensaje.button.payload);
         }
 
         /// <summary>

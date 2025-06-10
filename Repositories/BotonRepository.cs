@@ -48,4 +48,25 @@ public class BotonRepository
             return null!;
         }
     }
+
+    public static int GetBotonId(string boton)
+    {
+        switch (boton)
+        {
+            case "iniciar_jornada":
+                return 1;
+
+            case "pausar_jornada":
+                return 2;
+
+            case "reaunudar_jornada":
+                return 3;
+
+            case "finalizar_jornada":
+                return 4;
+
+            default:
+                return 0;
+        }
+    }
 }

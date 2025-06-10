@@ -223,7 +223,7 @@ namespace ApiWhatsapp.Controller
                     template = new Template
                     {
                         name = "mensaje_bienvenida",
-                        language = new Language { code = "es" },
+                        language = new Language { code = "es_ES" },
                         components =
                         [
                             new Component

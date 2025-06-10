@@ -69,13 +69,9 @@ namespace ApiWhatsapp.Helpers
                     await GuardarMensajeArchivo(mensaje);
                     break;
 
-                case "interactive":
+                case "button":
                     await GuardarMensajeBoton(mensaje);
                     await botonesHelper.ResponderMensaje(mensaje);
-                    break;
-
-                case "button":
-                    //await
                     break;
 
                 case "location":
@@ -127,7 +123,7 @@ namespace ApiWhatsapp.Helpers
             try
             {
                 var mensajeArchivo = mensajeRepository.ConstruirMensajeBotonGuardado(
-                    long.Parse(mensaje.from), 34644288224, int.Parse(mensaje.interactive.button_reply.id));
+                    long.Parse(mensaje.from), 34644288224, mensaje.button.payload);
 
                 await mensajeRepository.AddMensaje(mensajeArchivo);
             }

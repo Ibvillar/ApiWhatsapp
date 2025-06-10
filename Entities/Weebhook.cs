@@ -52,6 +52,8 @@
         public MessageDocument document { get; set; }
         public Interactive interactive { get; set; }
         public Location location { get; set; }
+        public Button button { get; set; }
+
     }
 
     public class MessageText
@@ -83,6 +85,13 @@
         public string id { get; set; }
         public string title { get; set; }
     }
+
+    public class Button
+    {
+        public string payload { get; set; }
+        public string text { get; set; }
+    }
+
 
     public class Location
     {

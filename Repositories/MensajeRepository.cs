@@ -1,6 +1,7 @@
 ﻿using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
+using ApiWhatsapp.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static System.Net.WebRequestMethods;
@@ -201,9 +202,10 @@ namespace ApiWhatsapp.BBDD
         /// <param name="numeroDestino">Número de teléfono del destinatario.</param>
         /// <param name="idBoton">ID del botón asociado al mensaje.</param>
         /// <returns>Un objeto Mensaje que contiene el botón asignado.</returns>
-        public Mensaje ConstruirMensajeBotonGuardado(long numeroOrigen, long numeroDestino, int idBoton)
+        public Mensaje ConstruirMensajeBotonGuardado(long numeroOrigen, long numeroDestino, string boton)
         {
             var mensaje = ConstruirMensaje(numeroOrigen, numeroDestino);
+            int idBoton = BotonRepository.GetBotonId(boton);
             mensaje.Boton = idBoton;
 
             return mensaje;
