@@ -76,6 +76,7 @@ namespace ApiWhatsapp.Helpers
 
                 case "location":
                     await GuardarLocalizacion(mensaje);
+                    await botonesHelper.ResponderMensajeUbicacion(mensaje.from);
                     break;
 
                 default:

@@ -207,7 +207,7 @@ namespace ApiWhatsapp.Controller
                 }
                 else
                 {
-                    telefono = telefonoDb;
+                    return BadRequest("Este telefono ya esta registrado");
                 }
 
                 long telefonoId = telefono.Id;

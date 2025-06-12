@@ -7,6 +7,7 @@ using ApiWhatsapp.Entitties;
 using ApiWhatsapp.Repositories;
 using AutoMapper;
 using Newtonsoft.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApiWhatsapp.Helpers
 {
@@ -64,54 +65,18 @@ namespace ApiWhatsapp.Helpers
             }
         }
 
-        /// <summary>
-        /// Procesa la acción correspondiente (iniciar, pausar, reanudar, finalizar) y envía la respuesta al usuario.
-        /// </summary>
-        /// <param name="idAccion">Identificador de la acción realizada.</param>
-        /// <param name="error">Resultado o mensaje de error.</param>
-        /// <param name="numero">Número de teléfono del usuario.</param>
-        private async Task ProcesarAccion(int idAccion, string error, string numero)
-        {
-            if (isError(error))
-                await enviarMensaje(error, numero, "error_control_presencia");
-            else
-                switch (idAccion) {
-                    case 1:
-                        await enviarMensaje("iniciado", numero, "succes_control_presencia");
-                        break;
-                    case 2:
-                        await enviarMensaje("pausado", numero, "succes_control_presencia");
-                        break;
-                    case 3:
-                        await enviarMensaje("reaunudado", numero, "succes_control_presencia");
-                        break;
-                    case 4:
-                        await enviarMensaje("finalizado", numero, "succes_control_presencia");
-                        break;
-                } 
-        }
-
-        private async Task enviarMensaje(string texto, string numero, string nombrePlantilla)
+        public async Task ResponderMensajeUbicacion(string numero)
         {
             await _mensajeController.EnviarMensaje(
                 JsonConvert.SerializeObject(new JsonMensajeBienvenida
                 {
-                    to = numero.ToString(),
+                    to = numero,
                     template = new Template
                     {
-                        name = nombrePlantilla,
+                        name = "ubicacion_compartida",
                         language = new Language { code = "es" },
                         components =
                         [
-                            new Component
-                            {
-                                type = "body",
-                                parameters =
-                                [
-                                    new Parameter { type = "text", text = texto },
-                                    new Parameter { type = "text", text = DateTime.Now.ToString("HH:mm")}
-                                ]
-                            },
                             new Component
                             {
                                 type = "button",
@@ -121,42 +86,39 @@ namespace ApiWhatsapp.Helpers
                                 {
                                     new Parameter { type = "payload", payload = "iniciar_jornada" }
                                 }
-                            },
-                            new Component
-                            {
-                                type = "button",
-                                sub_type = "quick_reply",
-                                index = "1",
-                                parameters = new List<Parameter>
-                                {
-                                    new Parameter { type = "payload", payload = "pausar_jornada" }
-                                }
-                            },
-                            new Component
-                            {
-                                type = "button",
-                                sub_type = "quick_reply",
-                                index = "2",
-                                parameters = new List<Parameter>
-                                {
-                                    new Parameter { type = "payload", payload = "reaunudar_jornada" }
-                                }
-                            },
-                            new Component
-                            {
-                                type = "button",
-                                sub_type = "quick_reply",
-                                index = "3",
-                                parameters = new List<Parameter>
-                                {
-                                    new Parameter { type = "payload", payload = "finalizar_jornada" }
-                                }
-                            },
+                            }
                         ]
                     }
                 },
                 Formatting.Indented
              ));
+        }
+
+        /// <summary>
+        /// Procesa la acción correspondiente (iniciar, pausar, reanudar, finalizar) y envía la respuesta al usuario.
+        /// </summary>
+        /// <param name="idAccion">Identificador de la acción realizada.</param>
+        /// <param name="error">Resultado o mensaje de error.</param>
+        /// <param name="numero">Número de teléfono del usuario.</param>
+        private async Task ProcesarAccion(int idAccion, string error, string numero)
+        {
+            if (isError(error))
+                await _mensajeController.EnviarMensaje(RespuestasHelpers.RespuestaError(numero, error));
+            else
+                switch (idAccion) {
+                    case 1:
+                        await _mensajeController.EnviarMensaje(RespuestasHelpers.RespuestaIniciarJornada(numero));
+                        break;
+                    case 2:
+                        await _mensajeController.EnviarMensaje(RespuestasHelpers.RespuestaPausarJornada(numero));
+                        break;
+                    case 3:
+                        await _mensajeController.EnviarMensaje(RespuestasHelpers.RespuestaReaunudarJornada(numero));
+                        break;
+                    case 4:
+                        await _mensajeController.EnviarMensaje(RespuestasHelpers.RespuestaFinalizarJornada(numero));
+                        break;
+                } 
         }
 
         /// <summary>
@@ -174,18 +136,7 @@ namespace ApiWhatsapp.Helpers
                         name = "soliciar_localizacion",
                         language = new Language { code = "es" },
                         components =
-                        [
-                            new Component
-                            {
-                                type = "button",
-                                sub_type = "quick_reply",
-                                index = "0",
-                                parameters = new List<Parameter>
-                                {
-                                    new Parameter { type = "payload", payload = "iniciar_jornada" }
-                                }
-                            }
-                        ]
+                        []
                     }
                 },
                 Formatting.Indented
