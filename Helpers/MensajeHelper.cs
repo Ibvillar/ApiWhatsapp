@@ -115,9 +115,7 @@ namespace ApiWhatsapp.EnvioMensajes
             var filePath = Path.Combine(uploadsPath, fileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
-            {
                 await file.CopyToAsync(stream);
-            }
 
             return filePath;
         }
@@ -159,9 +157,7 @@ namespace ApiWhatsapp.EnvioMensajes
 
             var jsonResponse = JsonSerializer.Deserialize<JsonElement>(content);
             if (jsonResponse.TryGetProperty("id", out JsonElement idProperty))
-            {
                 return idProperty.GetString()!;
-            }
 
             throw new Exception("No se pudo obtener el ID del archivo subido.");
         }
@@ -175,9 +171,7 @@ namespace ApiWhatsapp.EnvioMensajes
         {
             var provider = new FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(ruta, out string mimeType))
-            {
                 mimeType = "application/octet-stream";
-            }
 
             return mimeType;
         }

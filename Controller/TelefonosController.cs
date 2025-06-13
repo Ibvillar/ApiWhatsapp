@@ -34,18 +34,14 @@ namespace ApiWhatsapp.Controller
             {
                 string mensaje = ValidarTelefono(telefonoDTO);
                 if (mensaje is not null)
-                {
                     return BadRequest(mensaje);
-                }
 
 
                 Telefono telefono = telefonoRepository.ConstruirTelefono(
                                         telefonoDTO.Numero, telefonoDTO.Prefijo, telefonoDTO.Nombre);
 
                 if (await telefonoRepository.GetTelefonosById(telefono.Id) is not null)
-                {
                     return BadRequest("Este teléfono ya existe");
-                }
 
                 await telefonoRepository.AddTelefono(telefono);
 
@@ -69,9 +65,7 @@ namespace ApiWhatsapp.Controller
                 List<Telefono> telefonos = await telefonoRepository.GetTelefonos();
 
                 if (telefonos.IsNullOrEmpty())
-                {
                     return BadRequest("No hay teléfonos disponibles");
-                }
 
                 return Ok(telefonos);
             }
@@ -91,12 +85,10 @@ namespace ApiWhatsapp.Controller
         {
             try
             {
-                Telefono telefono = await telefonoRepository.GetTelefonosById(telefonoId);
+                Telefono? telefono = await telefonoRepository.GetTelefonosById(telefonoId);
 
                 if (telefono is null)
-                {
                     return NotFound("Este teléfono no existe");
-                }
 
                 return Ok(telefono);
             }
@@ -122,9 +114,7 @@ namespace ApiWhatsapp.Controller
                 bool result = await telefonoRepository.SetNombre(telefono.telfono, telefono.nombre);
 
                 if (result)
-                {
                     return Ok(telefono);
-                }
 
                 return BadRequest("El nombre no se ha podido cambiar");
             }
@@ -147,9 +137,7 @@ namespace ApiWhatsapp.Controller
                 bool exito = await telefonoRepository.RemoveTelefono(telefonoId);
 
                 if (exito)
-                {
                     return Ok("Se ha eliminado correctamente");
-                }
 
                 return NotFound("Este teléfono no existe");
             }
@@ -168,22 +156,16 @@ namespace ApiWhatsapp.Controller
         {
             // Validar prefijo (ej: códigos de país suelen estar entre 1 y 999)
             if (telefono.Prefijo <= 0 || telefono.Prefijo > 999)
-            {
                 return "El prefijo debe estar entre 1 y 999.";
-            }
 
             // Validar número (debe ser mayor a 0)
             if (telefono.Numero <= 0)
-            {
                 return "El número de teléfono debe ser mayor que cero.";
-            }
 
             // Validar longitud del número (por ejemplo, entre 6 y 9 dígitos)
             int longitudNumero = telefono.Numero.ToString().Length;
             if (longitudNumero < 6 || longitudNumero > 9)
-            {
                 return "El número de teléfono debe tener entre 6 y 9 dígitos.";
-            }
 
             return null;
         }

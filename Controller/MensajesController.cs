@@ -10,7 +10,6 @@ using ApiWhatsapp.DTO;
 using Microsoft.IdentityModel.Tokens;
 using ApiWhatsapp.Entities;
 using ApiWhatsapp.Helpers;
-using Newtonsoft.Json;
 
 namespace ApiWhatsapp.Controller
 {
@@ -88,7 +87,7 @@ namespace ApiWhatsapp.Controller
                 if (string.IsNullOrEmpty(rutaArchivo))
                     return BadRequest("No se pudo guardar el archivo");
 
-                int idFichero = await GuardarFichero(Path.GetFileName(rutaArchivo));
+                int idFichero = await GuardarFichero(file, Path.GetFileName(rutaArchivo));
                 await GuardarMensaje(NumeroEmpresa, numeroDestino, "", idFichero);
 
                 var mensaje = await _mensajesHelper.ConstruirMensajeImagen(numeroDestino, rutaArchivo);
@@ -121,7 +120,7 @@ namespace ApiWhatsapp.Controller
 
                 string nombreDocumento = Path.GetFileName(rutaArchivo);
 
-                int idFichero = await GuardarFichero(nombreDocumento);
+                int idFichero = await GuardarFichero(file, Path.GetFileName(rutaArchivo));
                 await GuardarMensaje(NumeroEmpresa, numeroDestino, "", idFichero);
 
                 var mensaje = await _mensajesHelper.ConstruirMensajeDocumento(numeroDestino, nombreDocumento, rutaArchivo);
@@ -206,9 +205,7 @@ namespace ApiWhatsapp.Controller
                     await telefonoRepository.AddTelefono(telefono);
                 }
                 else
-                {
                     return BadRequest("Este telefono ya esta registrado");
-                }
 
                 long telefonoId = telefono.Id;
 
@@ -217,41 +214,8 @@ namespace ApiWhatsapp.Controller
                 await telefonoRepository.AddCodigo(telefono, mensaje.Telefono.IdGenerales);
                 await telefonoRepository.SetUbicacion(mensaje.ubicacion, telefonoId);
 
-                var mensaje1 = new JsonMensajeBienvenida
-                {
-                    to = telefonoId.ToString(),
-                    template = new Template
-                    {
-                        name = "mensaje_bienvenida",
-                        language = new Language { code = "es" },
-                        components =
-                        [
-                            new Component
-                            {
-                                type = "body",
-                                parameters =
-                                [
-                                    new Parameter { type = "text", text = telefono.Nombre }
-                                ]
-                            },
-                            new Component
-                            {
-                                type = "button",
-                                sub_type = "quick_reply",
-                                index = "0",
-                                parameters = new List<Parameter>
-                                {
-                                    new Parameter { type = "payload", payload = "iniciar_jornada" }
-                                }
-                            },
-                        ]
-                    }
-                };
-
-                var json = JsonConvert.SerializeObject(mensaje1, Formatting.Indented);
-                bool enviado = await EnviarMensaje(json);
-
-                Console.WriteLine(json.ToString());
+                var mensaje1 = RespuestasHelpers.MensajeBienvenida(telefonoId, telefono.Nombre);
+                bool enviado = await EnviarMensaje(mensaje1);
 
                 if (!enviado) 
                     return BadRequest("No se ha podido mandar el mensaje de bienvenida correctamente");
@@ -388,20 +352,14 @@ namespace ApiWhatsapp.Controller
         /// </summary>
         /// <param name="phonNumberId">ID del número telefónico (no usado actualmente)</param>
         /// <returns>URL base como cadena</returns>
-        private static string getUrl(string phonNumberId)
-        {
-            return "https://graph.facebook.com/v22.0/109348135405910/";
-        }
+        private static string getUrl(string phonNumberId) {return "https://graph.facebook.com/v22.0/109348135405910/";}
 
         /// <summary>
         /// Serializa un objeto a formato JSON.
         /// </summary>
         /// <param name="mensaje">Objeto a serializar</param>
         /// <returns>Cadena JSON</returns>
-        private string CastToJson(object mensaje)
-        {
-            return System.Text.Json.JsonSerializer.Serialize(mensaje);
-        }
+        private string CastToJson(object mensaje) {return System.Text.Json.JsonSerializer.Serialize(mensaje);}
 
         /// <summary>
         /// Envía un mensaje a la API de WhatsApp.
@@ -418,9 +376,7 @@ namespace ApiWhatsapp.Controller
             var responseString = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
-            {
                 return true;
-            }
 
             Console.WriteLine(responseString);
             return false;
@@ -436,10 +392,8 @@ namespace ApiWhatsapp.Controller
         /// <returns>True si se guardó correctamente</returns>
         private async Task<bool> GuardarMensaje(long numeroOrigen, long numeroDestino, string texto, int idFichero)
         {
-            if (telefonoRepository.GetTelefonosById(numeroDestino) is null)
-            {
+            if (await telefonoRepository.GetTelefonosById(numeroDestino) is null)
                 throw new Exception($"El teléfono {numeroDestino} no está disponible o no existe");
-            }
 
             Mensaje mensaje = string.IsNullOrEmpty(texto)
                 ? mensajeRepository.ConstruirMensajeArchivo(numeroOrigen, numeroDestino, idFichero)
@@ -453,24 +407,20 @@ namespace ApiWhatsapp.Controller
         /// </summary>
         /// <param name="ruta">Ruta o nombre del fichero</param>
         /// <returns>ID del fichero guardado o existente</returns>
-        private async Task<int> GuardarFichero(string ruta)
+        private async Task<int> GuardarFichero(IFormFile file, string nombreArchivo)
         {
             try
             {
-                string nuevaRuta = _configuracion["RutaFicherosLocal"]! + ruta;
+                string nuevaRuta = Path.Combine(_configuracion["RutaFicherosLocal"]!, nombreArchivo);
 
-                FicherosHelper.CopiarArchivo(ruta, nuevaRuta);
+                await FicherosHelper.CopiarArchivoDesdeFormFile(file, nuevaRuta);
 
-                var fichero = ficheroRepository.ConstuirFichero(new FicheroDTO { Ruta = ruta });
+                var fichero = ficheroRepository.ConstuirFichero(new FicheroDTO { Ruta = nombreArchivo });
 
                 if (await ficheroRepository.ExisteFichero(fichero))
-                {
-                    fichero = await ficheroRepository.GetFicheroByRuta(ruta);
-                }
+                    fichero = await ficheroRepository.GetFicheroByRuta(nombreArchivo);
                 else
-                {
                     await ficheroRepository.AddFichero(fichero);
-                }
 
                 return fichero.Id;
             }
@@ -480,5 +430,6 @@ namespace ApiWhatsapp.Controller
                 throw new Exception(e.Message);
             }
         }
+
     }
 }

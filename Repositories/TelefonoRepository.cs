@@ -16,11 +16,6 @@ namespace ApiWhatsapp.BBDD
         private DbTerceros contextTerceros;
         private readonly IMapper mapper;
 
-        /// <summary>
-        /// Constructor del repositorio de teléfonos.
-        /// </summary>
-        /// <param name="context">Contexto de la base de datos</param>
-        /// <param name="mapper">Instancia de AutoMapper</param>
         public TelefonoRepository(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper)
         {
             this.context = context;
@@ -50,9 +45,7 @@ namespace ApiWhatsapp.BBDD
                 await context.SaveChangesAsync();
 
                 if (await GetTelefonosById(telefono.Id) is null)
-                {
                     return false;
-                }
 
                 return true;
             }
@@ -73,24 +66,16 @@ namespace ApiWhatsapp.BBDD
         {
             try
             {
-                // Asigna el nuevo nombre al objeto telefono
                 telefono.Nombre = nombre;
 
-                // Marca el objeto como modificado para que EF lo actualice en la base de datos
                 context.Telefonos.Update(telefono);
-
-                // Guarda los cambios de forma asíncrona
                 await context.SaveChangesAsync();
 
-                // Si todo va bien, retorna true
                 return true;
             }
             catch (Exception ex)
             {
-                // Corrige el ToString que estaba mal (olvidaste los paréntesis)
                 Console.WriteLine($"Error: {ex.ToString()}");
-
-                // Retorna false en caso de error
                 return false;
             }
         }
@@ -250,9 +235,7 @@ namespace ApiWhatsapp.BBDD
             telefono = await context.Telefonos.Where(x => x.Id == telefono!.Id).FirstOrDefaultAsync();
 
             if (telefono is null)
-            {
                 throw new Exception("Este teleofono no existe");
-            }
 
             telefono.IdGenerales = cod;
             await context.SaveChangesAsync();
@@ -276,6 +259,11 @@ namespace ApiWhatsapp.BBDD
             telefono.ubicacion = estado;
             await context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> GetUbicacion(long Id)
+        {
+            return context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id).Result!.ubicacion;
         }
 
         /// <summary>

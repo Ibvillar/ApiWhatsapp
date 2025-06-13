@@ -43,13 +43,21 @@ namespace ApiWhatsapp.Helpers
                 case 1:
                     bool tieneUbicacion = await _localizacionRepository.UsuarioTieneLocalizacion(long.Parse(mensaje.from));
 
-                    if (!tieneUbicacion)
+                    if (!tieneUbicacion && await _telefonosRepository.GetUbicacion(long.Parse(mensaje.from)))
                     {
                         await enviarMensajeLocalizacion(mensaje.from);
                         return;
                     }
 
-                    await ProcesarAccion(id, await _controller.IniciarJornada(codUsuario), mensaje.from);
+                    string result = await _controller.IniciarJornada(codUsuario);
+
+                    if (result == "1")
+                    {
+                        await _mensajeController.EnviarMensaje(RespuestasHelpers.RespuestaErrorJornadaIniciada(mensaje.from));
+                        return;
+                    }
+
+                    await ProcesarAccion(id, result, mensaje.from);
                     break;
                 case 2:
                     await ProcesarAccion(id, await _controller.PausarJornada(codUsuario), mensaje.from);
@@ -128,19 +136,7 @@ namespace ApiWhatsapp.Helpers
         private async Task enviarMensajeLocalizacion(string numero)
         {
             await _mensajeController.EnviarMensaje(
-                JsonConvert.SerializeObject(new JsonMensajeBienvenida
-                {
-                    to = numero.ToString(),
-                    template = new Template
-                    {
-                        name = "soliciar_localizacion",
-                        language = new Language { code = "es" },
-                        components =
-                        []
-                    }
-                },
-                Formatting.Indented
-             ));
+                RespuestasHelpers.MensajeErrorLocalizacion(long.Parse(numero)));
         }
 
         /// <summary>

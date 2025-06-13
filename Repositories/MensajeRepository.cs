@@ -33,9 +33,7 @@ namespace ApiWhatsapp.BBDD
                 await context.SaveChangesAsync();
 
                 if (await GetMensajesById(mensaje.Id) is null)
-                {
                     return false;
-                }
 
                 return true;
             }
@@ -72,9 +70,7 @@ namespace ApiWhatsapp.BBDD
         {
             List<Mensaje> mensajes = await GetMensajes();
             if (mensajes is null)
-            {
                 return null!;
-            }
 
             return mensajes.OrderBy(x => x.Fecha).FirstOrDefault(x => x.Id == Id)!;
         }
@@ -87,10 +83,8 @@ namespace ApiWhatsapp.BBDD
         public async Task<List<Mensaje>> GetMensajesByOrigen(long IdOrigen)
         {
             List<Mensaje> mensajes = await GetMensajes();
-            if (mensajes is null)
-            {
+            if (mensajes is null) 
                 return null!;
-            }
 
             return mensajes.Where(x => x.IdOrigen == IdOrigen).OrderBy(x => x.Fecha).ToList();
         }
@@ -104,9 +98,7 @@ namespace ApiWhatsapp.BBDD
         {
             List<Mensaje> mensajes = await GetMensajes();
             if (mensajes is null)
-            {
                 return null!;
-            }
 
             return mensajes.Where(x => x.IdDestino == IdDestino).OrderBy(x => x.Fecha).ToList();
         }
@@ -123,9 +115,7 @@ namespace ApiWhatsapp.BBDD
                 var mensaje = context.Mensajes.FirstOrDefault(x => x.Id == id);
 
                 if (mensaje is null)
-                {
                     return 0;
-                }
 
                 mensaje.Leido = true;
                 int modificado = await context.SaveChangesAsync();
@@ -150,9 +140,7 @@ namespace ApiWhatsapp.BBDD
                 Mensaje? mensaje = await context.Mensajes.FirstOrDefaultAsync(x => x.Id == mensajeId);
 
                 if (mensaje is null)
-                {
                     return -1;
-                }
 
                 context.Mensajes.Remove(mensaje);
                 await context.SaveChangesAsync();

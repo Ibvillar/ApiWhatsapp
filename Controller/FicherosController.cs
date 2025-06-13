@@ -33,24 +33,18 @@ namespace ApiWhatsapp.Controller
             ficheroDTO.Ruta = ValidarRuta(ficheroDTO.Ruta);
 
             if (ficheroDTO.Ruta == "")
-            {
                 return BadRequest("La ruta no es valida");
-            }
 
             // Construye la entidad a partir del DTO
             Fichero fichero = ficheroRepository.ConstuirFichero(ficheroDTO);
 
             // Verifica si ya existe
             if (await ficheroRepository.ExisteFichero(fichero))
-            {
                 return BadRequest("Este fichero ya existe. Utilizar remplazar");
-            }
 
             // Intenta guardar en la base de datos
             if (await ficheroRepository.AddFichero(fichero))
-            {
                 return Ok();
-            }
 
             return BadRequest("El fichero no se ha guardado correctamente");
         }
@@ -68,9 +62,7 @@ namespace ApiWhatsapp.Controller
                 List<Fichero> ficheros = ficheroRepository.GetFicheros();
 
                 if (ficheros.IsNullOrEmpty())
-                {
                     return NotFound("No hay ficheros disponibles");
-                }
 
                 string mainRoot = _configuration["RutaFicherosWeb"]!.Replace('\\', '/');
 
@@ -101,9 +93,7 @@ namespace ApiWhatsapp.Controller
                 Fichero fichero = await ficheroRepository.GetFicheroByRuta(ruta);
 
                 if (fichero is null)
-                {
                     return NotFound($"No se ha encontrado ningún fichero en la ruta: {ruta}");
-                }
 
                 return Ok(fichero);
             }
@@ -126,9 +116,7 @@ namespace ApiWhatsapp.Controller
                 Fichero fichero = ficheroRepository.GetFicheroById(id);
 
                 if (fichero is null)
-                {
                     return NotFound("Este fichero no existe");
-                }
 
                 return Ok(fichero);
             }

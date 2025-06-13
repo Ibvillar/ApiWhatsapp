@@ -26,12 +26,8 @@ namespace ApiWhatsapp.Controller
         [HttpGet]
         public IActionResult Verify([FromQuery(Name = "hub.mode")] string mode, [FromQuery(Name = "hub.challenge")] string challenge, [FromQuery(Name = "hub.verify_token")] string verify_token)
         {
-            Console.WriteLine($"hub_mode: {mode}, hub_challenge: {challenge}, hub_verify_token: {verify_token}");
-
             if (mode == "subscribe" && verify_token == VERIFY_TOKEN)
-            {
                 return Ok(challenge);
-            }
 
             return Forbid();
         }
@@ -53,13 +49,11 @@ namespace ApiWhatsapp.Controller
 
                 var messages = payload?.entry?[0]?.changes?[0]?.value?.messages;
                 if (messages != null)
-                {
                     // Logica para guardar el mensaje
                     foreach (var message in messages)
                     {
                         await webhookHelper.GuardarMensaje(message, contact!.wa_id);
                     }
-                }
             }
             catch (Exception ex)
             {

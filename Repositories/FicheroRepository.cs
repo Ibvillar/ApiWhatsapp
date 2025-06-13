@@ -31,9 +31,7 @@ namespace ApiWhatsapp.BBDD
                 await context.SaveChangesAsync();
 
                 if (GetFicheroById(fichero.Id) is null)
-                {
                     return false;
-                }
 
                 return true;
             }
@@ -56,17 +54,14 @@ namespace ApiWhatsapp.BBDD
                 Fichero fichero = context.Ficheros.FirstOrDefault(x => x.Id == Id);
 
                 if (fichero is null)
-                {
                     return false;
-                }
 
                 context.Ficheros.Remove(fichero);
                 int filasAfectadas = context.SaveChanges();
 
                 if (filasAfectadas == 0)
-                {
                     return false;
-                }
+
                 return true;
             }
             catch (Exception ex)
@@ -107,9 +102,7 @@ namespace ApiWhatsapp.BBDD
         {
             List<Fichero> ficheros = GetFicheros();
             if (ficheros is null)
-            {
                 return null!;
-            }
 
             return ficheros.FirstOrDefault(x => x.Id == Id)!;
         }
@@ -134,16 +127,12 @@ namespace ApiWhatsapp.BBDD
         public async Task<bool> ExisteFichero(Fichero fichero)
         {
             if (fichero is null)
-            {
                 return false;
-            }
 
             Fichero? fichero1  = await context.Ficheros.FirstOrDefaultAsync(x => x.Ruta == fichero.Ruta);
 
             if (fichero1 is null)
-            {
                 return false;
-            }
             
             return true;
         }
@@ -181,9 +170,7 @@ namespace ApiWhatsapp.BBDD
         {
             var provider = new FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(ruta, out string? extension))
-            {
                 extension = "application/octet-stream";
-            }
 
             return extension;
         }

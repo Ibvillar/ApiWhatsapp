@@ -4,6 +4,7 @@ using ApiWhatsapp.Entitties;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -50,6 +51,8 @@ namespace ApiWhatsapp.Controller
 
                 if (response.IsSuccessStatusCode)
                     return "00:00:00";
+                if (response.StatusCode == HttpStatusCode.Conflict)
+                    return "1";
                 else
                     return TryParseError(contenido);
             }
@@ -152,13 +155,11 @@ namespace ApiWhatsapp.Controller
             var root = doc.RootElement;
 
             if (root.TryGetProperty("errors", out var errores))
-            {
                 foreach (var prop in errores.EnumerateObject())
                 {
                     foreach (var msg in prop.Value.EnumerateArray())
                         return msg.GetString()!;
                 }
-            }
 
             if (root.TryGetProperty("message", out var mensaje))
                 return mensaje.GetString();
