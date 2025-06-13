@@ -167,7 +167,7 @@ namespace ApiWhatsapp.Controller
             if (longitudNumero < 6 || longitudNumero > 9)
                 return "El número de teléfono debe tener entre 6 y 9 dígitos.";
 
-            return null;
+            return null!;
         }
     }
 }
