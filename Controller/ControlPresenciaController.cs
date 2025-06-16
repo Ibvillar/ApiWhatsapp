@@ -1,8 +1,11 @@
-﻿using ApiWhatsapp.Data;
+﻿using ApiRestDatosComunes.Entities;
+using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
 using ApiWhatsapp.Entitties;
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http.Headers;
@@ -15,21 +18,12 @@ namespace ApiWhatsapp.Controller
     /// </summary>
     [ApiController]
     [Route("control-presencia")]
-    public class ControlPresenciaController
+    public class ControlPresenciaController(IConfiguration _configuration, MensajesController mensajes, DbWhatsapp _context, DbTerceros terceros, IMapper mapper, DbControlPresencia contextPresencia)
     {
-        private readonly HttpClient _httpClient;
-        private readonly string URL;
-        private string Cod;
-        private TokenValidationDTO _tokenActual;
-        private DbWhatsapp _context;
-
-        public ControlPresenciaController(IConfiguration _configuration, MensajesController mensajes, DbWhatsapp _context, DbTerceros terceros, IMapper mapper)
-        {
-            _httpClient = new HttpClient();
-            URL = _configuration["RutaControlPresencia"]!;
-            Cod = "";
-            this._context = _context;
-        }
+        private readonly HttpClient _httpClient = new ();
+        private readonly string URL = _configuration["RutaControlPresencia"]!;
+        private string Cod = "";
+        private TokenValidationDTO? _tokenActual;
 
         /// <summary>
         /// Inicia la jornada de un usuario a través de su código.
@@ -130,12 +124,15 @@ namespace ApiWhatsapp.Controller
                 var token = await ObtenerToken(cod);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.token);
 
+                if (!await isLocalizacion(cod))
+                    return "1";
+
                 var url = URL + "reloj/finalizar-jornada/" + Cod;
                 var response = await _httpClient.PutAsync(url, null);
                 string contenido = await response.Content.ReadAsStringAsync();
 
                 return response.IsSuccessStatusCode
-                    ? contenido.Substring(1, contenido.Length - 2)
+                    ? contenido[1..^1]
                     : TryParseError(contenido);
             }
             catch (Exception ex)
@@ -221,6 +218,37 @@ namespace ApiWhatsapp.Controller
             {
                 return contenido;
             }
+        }
+
+        private async Task<bool> isLocalizacion(string userCode)
+        {
+            string query = @"SELECT TOP 1 M.*
+                            FROM dbo.MOVIMIENTOS AS M
+                            JOIN dbo.DIAS AS D ON D.IDDIAS = M.IDDIAS
+                            JOIN dbo.SEMANAS AS S ON S.IDSEMANAS = D.IDSEMANAS
+                            JOIN Generales.dbo.datgen_0003 AS G ON G.ide_0003 = S.IDUSUARIOS
+                            Where G.cod_0003 = @UserCode
+                            ORDER BY M.HORA DESC";
+
+            Movimientos? result;
+
+            try
+            {
+                result = await contextPresencia.Movimientos
+                    .FromSqlRaw(query, new SqlParameter("@UserCode", userCode))
+                    .FirstOrDefaultAsync();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+
+            if (result is null || (DateTime.Now.TimeOfDay - result.Hora).TotalMinutes > 3)
+                return false;
+
+            return true;
         }
     }
 }

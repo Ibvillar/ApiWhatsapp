@@ -15,9 +15,9 @@ namespace ApiWhatsapp.Controller
         private const string VERIFY_TOKEN = "rUVHBwXaFGlI0OOLpC5TdByEzzDI8LGlJayhXUz0";
         private WebhookHelper webhookHelper;
 
-        public WhatsappWebhookController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration configuration)
+        public WhatsappWebhookController(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration configuration, DbControlPresencia contextPresencia)
         {
-            webhookHelper = new WebhookHelper(context, contextTerceros, mapper, configuration);
+            webhookHelper = new WebhookHelper(context, contextTerceros, mapper, configuration, contextPresencia);
         }
 
         /// <summary>

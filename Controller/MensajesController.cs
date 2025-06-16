@@ -214,7 +214,7 @@ namespace ApiWhatsapp.Controller
                 await telefonoRepository.AddCodigo(telefono, mensaje.Telefono.IdGenerales);
                 await telefonoRepository.SetUbicacion(mensaje.ubicacion, telefonoId);
 
-                var mensaje1 = RespuestasHelpers.MensajeBienvenida(telefonoId, telefono.Nombre);
+                var mensaje1 = RespuestasHelpers.MensajeBienvenida(telefonoId.ToString(), telefono.Nombre);
                 bool enviado = await EnviarMensaje(mensaje1);
 
                 if (!enviado) 

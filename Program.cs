@@ -20,6 +20,9 @@ builder.Services.AddDbContext<DbWhatsapp>(opciones =>
 builder.Services.AddDbContext<DbTerceros>(opciones =>
                     opciones.UseSqlServer("name=TercerosConecction"), ServiceLifetime.Scoped);
 
+builder.Services.AddDbContext<DbControlPresencia>(opciones =>
+                    opciones.UseSqlServer("name=PresenciaConecction"), ServiceLifetime.Scoped);
+
 //CORS
 builder.Services.AddCors(options =>
 {

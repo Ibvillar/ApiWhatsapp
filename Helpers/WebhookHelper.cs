@@ -27,7 +27,7 @@ namespace ApiWhatsapp.Helpers
         private readonly IMapper mapper;
         private readonly LocalizacionRepository localizacionRepository;
 
-        public WebhookHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration configuration)
+        public WebhookHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration configuration, DbControlPresencia contextPresencia)
         {
             this.context = context;
             this.mapper = mapper;
@@ -37,7 +37,7 @@ namespace ApiWhatsapp.Helpers
             _httpClient = new HttpClient();
             _configuration = configuration;
             ruta = _configuration["RutaFicherosLocal"]!;
-            botonesHelper = new BotonesHelper(context, contextTerceros, mapper, configuration);
+            botonesHelper = new BotonesHelper(context, contextTerceros, mapper, configuration, contextPresencia);
             localizacionRepository = new LocalizacionRepository(context);
         }
 

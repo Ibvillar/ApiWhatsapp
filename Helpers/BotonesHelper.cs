@@ -1,4 +1,5 @@
-﻿using ApiWhatsapp.BBDD;
+﻿using ApiRestDatosComunes.Entities;
+using ApiWhatsapp.BBDD;
 using ApiWhatsapp.Controller;
 using ApiWhatsapp.Data;
 using ApiWhatsapp.DTO;
@@ -6,6 +7,8 @@ using ApiWhatsapp.Entities;
 using ApiWhatsapp.Entitties;
 using ApiWhatsapp.Repositories;
 using AutoMapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -20,13 +23,15 @@ namespace ApiWhatsapp.Helpers
         private readonly ControlPresenciaController _controller;
         private readonly TelefonoRepository _telefonosRepository;
         private readonly LocalizacionRepository _localizacionRepository;
+        private readonly DbControlPresencia _contextPresencia;
 
-        public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion)
+        public BotonesHelper(DbWhatsapp context, DbTerceros contextTerceros, IMapper mapper, IConfiguration _configuracion, DbControlPresencia contextPresencia)
         {
             _localizacionRepository = new LocalizacionRepository(context);
             _mensajeController = new MensajesController(context, contextTerceros, mapper, _configuracion);
-            _controller = new ControlPresenciaController(_configuracion, _mensajeController, context, contextTerceros, mapper);
+            _controller = new ControlPresenciaController(_configuracion, _mensajeController, context, contextTerceros, mapper, contextPresencia);
             _telefonosRepository = new TelefonoRepository(context, contextTerceros, mapper);
+            _contextPresencia = contextPresencia;
         }
 
         /// <summary>
@@ -37,6 +42,7 @@ namespace ApiWhatsapp.Helpers
         {
             int id = GetId(mensaje);
             var codUsuario = await GetCodFromNumber(mensaje.from);
+            string result;
 
             switch (id)
             {
@@ -49,7 +55,7 @@ namespace ApiWhatsapp.Helpers
                         return;
                     }
 
-                    string result = await _controller.IniciarJornada(codUsuario);
+                    result = await _controller.IniciarJornada(codUsuario);
 
                     if (result == "1")
                     {
@@ -66,40 +72,58 @@ namespace ApiWhatsapp.Helpers
                     await ProcesarAccion(id, await _controller.ReaunudarJornada(codUsuario), mensaje.from);
                     break;
                 case 4:
-                    await ProcesarAccion(id, await _controller.FinalizarJornada(codUsuario), mensaje.from);
+                    result = await _controller.FinalizarJornada(codUsuario);
+
+                    if (result == "1")
+                    {
+                        await _mensajeController.EnviarMensaje(
+                            RespuestasHelpers.MensajeErrorLocalizacion(mensaje.from));
+                        return;
+                    }
+
+                    await ProcesarAccion(id, result, mensaje.from);
                     break;
                 default:
                     break;
             }
         }
 
+        /// <summary>
+        /// Responde a mensajes con formato ubicacion
+        /// </summary>
+        /// <param name="numero">Numero al que se va a enviar el mensaje</param>
+        /// <returns>True si se ha completado correctamente, false en caso contrario</returns>
         public async Task ResponderMensajeUbicacion(string numero)
         {
-            await _mensajeController.EnviarMensaje(
-                JsonConvert.SerializeObject(new JsonMensajeBienvenida
-                {
-                    to = numero,
-                    template = new Template
-                    {
-                        name = "ubicacion_compartida",
-                        language = new Language { code = "es" },
-                        components =
-                        [
-                            new Component
-                            {
-                                type = "button",
-                                sub_type = "quick_reply",
-                                index = "0",
-                                parameters = new List<Parameter>
-                                {
-                                    new Parameter { type = "payload", payload = "iniciar_jornada" }
-                                }
-                            }
-                        ]
-                    }
-                },
-                Formatting.Indented
-             ));
+            var telefono = await _telefonosRepository.GetTelefonosById(long.Parse(numero));
+            Console.WriteLine("1111111111111111111111111111111111111111");
+            string query = @"SELECT TOP 1 M.*
+                            FROM MOVIMIENTOS AS M
+                            JOIN DIAS AS D ON D.IDDIAS = M.IDDIAS
+                            JOIN SEMANAS AS S ON S.IDSEMANAS = D.IDSEMANAS
+                            JOIN Generales.dbo.datgen_0003 AS G ON G.ide_0003 = S.IDUSUARIOS
+                            Where G.cod_0003 = @UserCode
+                            ORDER BY M.HORA DESC";
+
+            Movimientos? result;
+
+            try
+            {
+                result = await _contextPresencia.Movimientos
+                    .FromSqlRaw(query, new SqlParameter("@UserCode", telefono!.IdGenerales))
+                    .FirstOrDefaultAsync();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return;
+            }
+
+            if (result!.IdTiposMovimientos == 1)
+                await _mensajeController.EnviarMensaje(RespuestasHelpers.MensajeUbicacionCompartida(numero));
+            else
+                await _mensajeController.EnviarMensaje(RespuestasHelpers.MensajeUbicacionCompartidaFinalizada(numero));
         }
 
         /// <summary>
@@ -136,7 +160,7 @@ namespace ApiWhatsapp.Helpers
         private async Task enviarMensajeLocalizacion(string numero)
         {
             await _mensajeController.EnviarMensaje(
-                RespuestasHelpers.MensajeErrorLocalizacion(long.Parse(numero)));
+                RespuestasHelpers.MensajeErrorLocalizacion(numero));
         }
 
         /// <summary>
@@ -176,8 +200,8 @@ namespace ApiWhatsapp.Helpers
         private async Task<string> GetCodFromNumber(string numero)
         {
             long longNumber = long.Parse(numero);
-            Telefono telefono = await _telefonosRepository.GetTelefonosById(longNumber);
-            return telefono.IdGenerales;
+            Telefono? telefono = await _telefonosRepository.GetTelefonosById(longNumber);
+            return telefono!.IdGenerales;
         }
     }
 }
