@@ -205,7 +205,7 @@ namespace ApiWhatsapp.Helpers
             try
             {
                 Localizacion? localizacion = await localizacionRepository.GetLocalizacionByDia(
-                    DateOnly.FromDateTime(DateTime.UtcNow), long.Parse(mensaje.from));
+                    DateTime.UtcNow, long.Parse(mensaje.from));
 
                 if (localizacion is not null)
                     return;
@@ -214,7 +214,7 @@ namespace ApiWhatsapp.Helpers
                 {
                     Longitud = mensaje.location.longitude,
                     Latitud = mensaje.location.latitude,
-                    Dia = DateOnly.FromDateTime(DateTime.UtcNow),
+                    Dia = DateTime.UtcNow,
                     IdTelefono = long.Parse(mensaje.from)
                 });
             }

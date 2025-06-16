@@ -77,7 +77,7 @@ namespace ApiWhatsapp.Repositories
         /// <param name="date">Fecha (día) de la localización.</param>
         /// <param name="telefonoId">ID del teléfono asociado.</param>
         /// <returns>Devuelve la localización encontrada o null si no existe.</returns>
-        public async Task<Localizacion?> GetLocalizacionByDia(DateOnly date, long telefonoId)
+        public async Task<Localizacion?> GetLocalizacionByDia(DateTime date, long telefonoId)
         {
             return await context.Localizaciones.Where(x =>
             x.Dia == date && x.IdTelefono == telefonoId).FirstOrDefaultAsync();

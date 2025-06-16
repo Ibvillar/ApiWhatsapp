@@ -96,7 +96,7 @@ namespace ApiWhatsapp.Helpers
         public async Task ResponderMensajeUbicacion(string numero)
         {
             var telefono = await _telefonosRepository.GetTelefonosById(long.Parse(numero));
-            Console.WriteLine("1111111111111111111111111111111111111111");
+            
             string query = @"SELECT TOP 1 M.*
                             FROM MOVIMIENTOS AS M
                             JOIN DIAS AS D ON D.IDDIAS = M.IDDIAS
