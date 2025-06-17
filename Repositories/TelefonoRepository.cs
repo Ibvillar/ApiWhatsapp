@@ -108,10 +108,12 @@ namespace ApiWhatsapp.BBDD
         {
             try
             {
-                return await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
+                Telefono? telefono = await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
+                return telefono;
             }
             catch (Exception ex)
             {
+                Console.WriteLine("1111111111111111111111111111111111111111111111");
                 Console.WriteLine(ex.ToString());
                 return null;
             }
@@ -263,7 +265,8 @@ namespace ApiWhatsapp.BBDD
 
         public async Task<bool> GetUbicacion(long Id)
         {
-            return context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id).Result!.ubicacion;
+            var telefono = await context.Telefonos.FirstOrDefaultAsync(x => x.Id == Id);
+            return telefono?.ubicacion ?? false;
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace ApiWhatsapp.Repositories
             await context.AddAsync(localizacion);
             await context.SaveChangesAsync();
 
-            return (GetLocalizacionById(localizacion.Id, localizacion.IdTelefono) == null) ? 1 : -1;
+            return (await GetLocalizacionById(localizacion.Id, localizacion.IdTelefono) == null) ? 1 : -1;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ApiWhatsapp.Repositories
         /// <returns>Devuelve true si existe una localización para el día actual, false en caso contrario.</returns>
         public async Task<bool> UsuarioTieneLocalizacion(long telefonoId)
         {
-            var ahora = DateOnly.FromDateTime(DateTime.UtcNow);
+            var ahora = DateTime.UtcNow;
 
             var localizacionReciente = await (
                 from loc in context.Localizaciones
